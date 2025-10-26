@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import Header from '@/components/Header';
 import CurrentWeatherCard from '@/components/weather/CurrentWeatherCard';
 import HourlyForecast from '@/components/weather/HourlyForecast';
 import DailyForecast from '@/components/weather/DailyForecast';
@@ -119,15 +118,12 @@ export default function DashboardPage() {
 
   if (authLoading || loading) {
     return (
-      <>
-        <Header />
-        <main className="flex min-h-screen flex-col items-center justify-center px-4 py-24">
-          <div className="text-center">
-            <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-            <p className="text-gray-600 dark:text-gray-400">Cargando datos meteorológicos...</p>
-          </div>
-        </main>
-      </>
+      <div className="flex min-h-screen flex-col items-center justify-center px-4">
+        <div className="text-center">
+          <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+          <p className="text-gray-600 dark:text-gray-400">Cargando datos meteorológicos...</p>
+        </div>
+      </div>
     );
   }
 
@@ -136,18 +132,16 @@ export default function DashboardPage() {
   }
 
   return (
-    <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 px-4 py-24 dark:bg-gray-900 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-8">
-            <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
-              Meteorología de Viveiro
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Datos en tiempo real de MeteoGalicia
-            </p>
-          </div>
+    <div className="min-h-screen bg-gray-50 px-4 py-8 dark:bg-gray-900 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8">
+          <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
+            Meteorología de Viveiro
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Datos en tiempo real de MeteoGalicia
+          </p>
+        </div>
 
           {/* Tabs Navigation */}
           <div className="mb-8 border-b border-gray-200 dark:border-gray-700">
@@ -308,12 +302,11 @@ export default function DashboardPage() {
             </>
           )}
 
-          {/* Stations Tab Content */}
-          {activeTab === 'stations' && (
-            <StationsView />
-          )}
-        </div>
-      </main>
-    </>
+        {/* Stations Tab Content */}
+        {activeTab === 'stations' && (
+          <StationsView />
+        )}
+      </div>
+    </div>
   );
 }
