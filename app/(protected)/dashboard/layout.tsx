@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -54,18 +54,37 @@ const sections: SectionLink[] = [
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
   };
 
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Overlay para móvil */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
+      <aside
+        className={`
+          fixed left-0 top-0 z-50 h-screen w-64 border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950
+          transform transition-transform duration-300 ease-in-out lg:translate-x-0
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
         {/* Logo/Header */}
-        <div className="flex h-16 items-center border-b border-gray-200 px-6 dark:border-gray-800">
-          <Link href="/dashboard" className="flex items-center space-x-2">
+        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-6 dark:border-gray-800">
+          <Link href="/dashboard" className="flex items-center space-x-2" onClick={closeSidebar}>
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600">
               <svg
                 className="h-5 w-5 text-white"
@@ -85,6 +104,27 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               viveiro.live
             </span>
           </Link>
+
+          {/* Botón cerrar en móvil */}
+          <button
+            onClick={closeSidebar}
+            className="lg:hidden rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+            aria-label="Cerrar menú"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
         </div>
 
         {/* Navigation */}
@@ -92,6 +132,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           {/* Dashboard Home */}
           <Link
             href="/dashboard"
+            onClick={closeSidebar}
             className={`
               flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors
               ${
@@ -130,6 +171,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               <Link
                 key={section.id}
                 href={section.path}
+                onClick={closeSidebar}
                 className={`
                   flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors
                   ${
@@ -181,15 +223,60 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <div className="ml-64 flex-1">
+      <div className="flex-1 lg:ml-64">
         {/* Top Navbar */}
         <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/80">
-          <div className="flex h-16 items-center justify-between px-6">
-            <div>
-              {/* Breadcrumb or page title can go here */}
+          <div className="flex h-16 items-center justify-between px-4 sm:px-6">
+            <div className="flex items-center">
+              {/* Botón hamburguesa (solo móvil) */}
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden mr-4 rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                aria-label="Abrir menú"
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </button>
+
+              {/* Logo en móvil */}
+              <Link href="/dashboard" className="flex items-center space-x-2 lg:hidden">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600">
+                  <svg
+                    className="h-5 w-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                    />
+                  </svg>
+                </div>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  viveiro.live
+                </span>
+              </Link>
             </div>
+
             <div className="flex items-center space-x-4">
-              {/* Additional header actions can go here */}
+              {/* Email del usuario en desktop */}
+              <span className="hidden text-sm text-gray-600 dark:text-gray-400 lg:inline-block">
+                {user?.email}
+              </span>
             </div>
           </div>
         </header>
