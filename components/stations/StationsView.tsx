@@ -8,17 +8,9 @@ import StationSelector from './StationSelector';
 import StationDataCard from './StationDataCard';
 import StationComparisonChart from './StationComparisonChart';
 
-// Importación dinámica para evitar problemas con SSR de Leaflet
+// Importación del mapa con Google Maps
 const StationsMap = dynamic(() => import('./StationsMap'), {
   ssr: false,
-  loading: () => (
-    <div className="flex h-96 w-full items-center justify-center rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
-      <div className="text-center">
-        <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500"></div>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Cargando mapa...</p>
-      </div>
-    </div>
-  ),
 });
 
 interface StationsData {
