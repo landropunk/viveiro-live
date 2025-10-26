@@ -129,6 +129,16 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1 px-3 py-4">
+          {/* Home Pública */}
+          <Link
+            href="/"
+            onClick={closeSidebar}
+            className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+          >
+            <span className="mr-3 text-xl">🌐</span>
+            <span>Inicio</span>
+          </Link>
+
           {/* Dashboard Home */}
           <Link
             href="/dashboard"
