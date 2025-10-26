@@ -1,283 +1,234 @@
-# Meteo Históricos Viveiro 🌤️📊
+# viveiro.live 🏛️
 
-Aplicación meteorológica completa para Viveiro (Lugo, Galicia) con integración de la API V5 de MeteoGalicia. Ofrece datos meteorológicos en tiempo real, predicciones y **datos históricos de estaciones de observación** con gráficos comparativos interactivos.
+Portal municipal integral de Viveiro (Lugo, España) - Plataforma multi-seccional para ciudadanos con meteorología, eventos en directo, webcams y más.
 
-## 🌟 Características
+## 🌟 Secciones del Portal
 
-### Predicción Meteorológica
-- **Clima actual en tiempo real** - Temperatura, humedad, viento, precipitación
-- **Sensación térmica precisa** - Cálculo con fórmulas Wind Chill y Heat Index
-- **Pronóstico por horas** - Predicción para las próximas 12 horas con iconos
-- **Pronóstico diario** - Vista de 4 días con franjas horarias (mañana, tarde, noche)
-- **Índice UV** - Niveles de radiación ultravioleta con recomendaciones de protección
+### 🏠 Home Pública (sin login)
+- Información del Ayuntamiento de Viveiro
+- Noticias y anuncios municipales
+- Enlaces de interés
+- Acceso a registro/login
 
-### 🆕 Estaciones Meteorológicas (Datos Históricos Reales)
-- **2 Estaciones de Viveiro** - Penedo do Galo (545m) y Borreiros (59m)
-- **Datos en tiempo real** - Actualización automática cada 15 minutos + botón manual
-- **Datos 100% reales** - Integración directa con endpoint oficial de MeteoGalicia
-- **Históricos de hasta 72 horas** - Períodos de 24h, 48h (2 días), 72h (3 días)
-- **Selector de estaciones** - Comparación múltiple con selección interactiva
-- **Parámetros principales** - Temperatura, humedad, viento (media + rachas), precipitación, presión
-- **Gráficos comparativos temporales** - Evolución de parámetros con datos reales horarios
-- **Tarjetas detalladas** - Información completa con última hora de actualización
-- **Sin caché** - Datos siempre frescos al abrir el dashboard
+### ☁️ Meteorología
+- Datos meteorológicos en tiempo real de MeteoGalicia API V5
+- 2 Estaciones de Viveiro: Penedo do Galo (545m) y Borreiros (59m)
+- Históricos de hasta 72 horas con gráficos comparativos
+- Pronósticos horarios y diarios
+- Índice UV y alertas meteorológicas
 
-### General
-- **Datos reales de MeteoGalicia** - Integración con API V5 y RSS/JSON para observaciones
-- **Sistema de autenticación** - Supabase Auth con OAuth (Google, Facebook, Apple)
-- **Diseño responsivo** - Optimizado para móvil, tablet y escritorio
-- **Modo oscuro** - Soporte completo para tema claro/oscuro
-- **Iconos meteorológicos oficiales** - Usando los iconos de MeteoGalicia
+### 📅 Eventos en Directo
+- Calendario de eventos municipales
+- Streaming en directo de eventos
+- Información detallada de cada evento
+
+### 📷 Webcams
+- Visualización en directo de cámaras en Viveiro
+- Grid de múltiples cámaras
+- Vista fullscreen
+
+### 🔧 Secciones Adicionales (en desarrollo)
+- Sección 4: Por definir
+- Sección 5: Por definir
 
 ## 🚀 Tecnologías
 
 - **Framework**: Next.js 14 (App Router)
 - **Lenguaje**: TypeScript 5.9
 - **Estilos**: Tailwind CSS 3.4
-- **Gráficos**: Recharts 3.3.0
-- **Autenticación**: Supabase Auth (@supabase/ssr) con OAuth
-- **Base de datos**: PostgreSQL (Supabase) con Row Level Security
-- **API**: MeteoGalicia API V5 + RSS/JSON para observaciones
+- **Base de datos**: Supabase (PostgreSQL)
+- **Autenticación**: Supabase Auth + OAuth (Google, Microsoft, Facebook)
+- **Gráficos**: Recharts 3.3
 - **Testing**: Vitest 3.2 + React Testing Library
-- **Linter**: ESLint 9
+- **Deploy**: Vercel
+- **Gestión**: pnpm
+
+## 📁 Estructura del Proyecto
+
+```
+viveiro-live/
+├── app/
+│   ├── (public)/              # Rutas públicas (home, noticias, anuncios)
+│   ├── auth/                  # Login, registro, callback OAuth
+│   └── (protected)/dashboard/ # Rutas protegidas con sidebar
+│       ├── meteo/             # Sección meteorología
+│       ├── eventos/           # Sección eventos
+│       ├── webcams/           # Sección webcams
+│       └── ...                # Secciones futuras
+├── components/
+│   ├── layout/                # Sidebar, Navbar, Layout
+│   ├── weather/               # Componentes meteorológicos
+│   └── stations/              # Componentes de estaciones
+├── contexts/
+│   └── AuthContext.tsx        # Contexto de autenticación global
+├── lib/
+│   ├── supabase/              # Cliente y helpers de Supabase
+│   └── meteogalicia.ts        # Cliente API MeteoGalicia
+└── middleware.ts              # Protección de rutas
+
+```
+
+## 🔑 Autenticación
+
+Sistema centralizado para todas las secciones:
+
+### OAuth Providers
+- ✅ Google (Gmail)
+- ✅ Microsoft (Outlook/Hotmail)
+- ✅ Facebook
+
+### Características
+- Un solo login para todo el portal
+- Todos los usuarios registrados acceden a todas las secciones
+- Posibilidad futura de usuarios premium
+- Cookies HttpOnly seguras
+- Row Level Security en Supabase
 
 ## 📦 Instalación
 
-1. **Clonar el repositorio**
 ```bash
-git clone https://github.com/landropunk/Meteo-Historicos-Viveiro.git
-cd Meteo-Historicos-Viveiro
-```
+# Clonar repositorio
+git clone https://github.com/landropunk/viveiro-live.git
+cd viveiro-live
 
-2. **Instalar dependencias**
-```bash
+# Instalar dependencias
 pnpm install
-```
 
-3. **Configurar Supabase**
-
-Sigue la guía completa en [SUPABASE_SETUP.md](SUPABASE_SETUP.md) para:
-- Crear un proyecto en Supabase
-- Configurar OAuth providers (Google, Facebook, Apple)
-- Configurar políticas de Row Level Security (RLS)
-
-4. **Configurar variables de entorno**
-```bash
+# Configurar variables de entorno
 cp .env.example .env.local
+# Editar .env.local con tus credenciales
+
+# Desarrollo
+pnpm dev
+
+# Build producción
+pnpm build
+
+# Iniciar producción
+pnpm start
 ```
 
-Edita `.env.local` y añade tus credenciales:
+## 🌐 Variables de Entorno
+
 ```env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key_aqui
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
 
-# MeteoGalicia API
-METEOGALICIA_API_KEY=tu_api_key_aqui
+# MeteoGalicia (opcional, API pública)
+METEOGALICIA_API_KEY=tu_api_key
 ```
 
-5. **Ejecutar en desarrollo**
-```bash
-pnpm dev
-```
-
-Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
-
-## 🔑 Obtener API Key de MeteoGalicia
-
-1. Visita [MeteoGalicia](https://www.meteogalicia.gal/)
-2. Solicita una API key para desarrolladores
-3. Añádela a tu archivo `.env.local`
-
-## 📖 Uso
-
-1. **Registro**: Crea una cuenta en `/auth/register`
-2. **Login**: Inicia sesión en `/auth/login`
-3. **Dashboard**: Accede al panel meteorológico en `/dashboard`
-
-## 🌐 Datos Meteorológicos
-
-La aplicación obtiene datos de dos fuentes de MeteoGalicia:
-
-### API V5 - Datos Horarios
-- Temperatura (°C)
-- Precipitación (mm)
-- Viento (velocidad y dirección)
-- Estado del cielo (con iconos oficiales)
-- Humedad relativa (%)
-
-### RSS/JSON - Datos Municipales
-- Temperaturas máximas y mínimas diarias
-- Índice UV máximo
-- Nivel de avisos meteorológicos
-- Probabilidad de lluvia por franjas horarias
-
-## 🛠️ Scripts Disponibles
+## 🛠️ Scripts
 
 ```bash
-pnpm dev         # Servidor de desarrollo
-pnpm build       # Build de producción
-pnpm start       # Servidor de producción
-pnpm lint        # Linter
-pnpm test        # Ejecutar tests
+pnpm dev              # Servidor desarrollo (localhost:3000)
+pnpm build            # Build producción
+pnpm start            # Servidor producción
+pnpm lint             # ESLint
+pnpm test             # Tests con Vitest
+pnpm test:ui          # Tests con UI
+pnpm test:coverage    # Cobertura de tests
 ```
 
-## 🗂️ Estructura del Proyecto
+## 📚 Documentación
 
-```
-├── app/
-│   ├── api/
-│   │   └── protected/
-│   │       ├── weather/             # Endpoints de predicción
-│   │       ├── stations/            # Endpoints de estaciones
-│   │       └── me/                  # Endpoint de usuario
-│   ├── auth/
-│   │   ├── login/                   # Página de login
-│   │   ├── register/                # Página de registro
-│   │   └── callback/                # OAuth callback handler
-│   └── dashboard/                   # Dashboard con pestañas
-├── components/
-│   ├── weather/                     # Componentes de predicción
-│   │   ├── CurrentWeatherCard.tsx
-│   │   ├── HourlyForecast.tsx
-│   │   ├── DailyForecast.tsx
-│   │   └── UVWidget.tsx
-│   └── stations/                    # Componentes de estaciones
-│       ├── StationsView.tsx
-│       ├── StationSelector.tsx
-│       ├── StationDataCard.tsx
-│       └── HistoricalChart.tsx
-├── contexts/
-│   └── AuthContext.tsx              # React Context para autenticación
-├── lib/
-│   ├── supabase/
-│   │   ├── client.ts                # Cliente Supabase browser
-│   │   ├── server.ts                # Cliente Supabase server
-│   │   ├── middleware.ts            # Gestión de sesiones
-│   │   └── auth-helpers.ts          # Helper requireAuth
-│   ├── meteogalicia.ts              # Cliente API predicción
-│   └── meteogalicia-stations.ts     # Cliente API estaciones
-├── types/
-│   ├── auth.ts                      # Tipos de autenticación
-│   └── weather.ts                   # Tipos meteorológicos + estaciones
-└── middleware.ts                    # Middleware de Next.js
-```
+- [PLAN_MIGRACION_VIVEIRO_LIVE.md](./PLAN_MIGRACION_VIVEIRO_LIVE.md) - Plan completo de migración
+- [OAUTH_CONFIGURADO.md](./OAUTH_CONFIGURADO.md) - Configuración OAuth completa
+- [OAUTH_SETUP.md](./OAUTH_SETUP.md) - Guía paso a paso OAuth
+- [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) - Configuración Supabase
+- [CHANGELOG.md](./CHANGELOG.md) - Historial de cambios
 
-## Testing
+## 🗄️ Base de Datos (Supabase)
 
-Los tests están configurados con Vitest y React Testing Library:
+### Tablas Principales
 
-```bash
-# Ejecutar tests
-pnpm test
+- `users` - Usuarios (via Supabase Auth)
+- `noticias` - Noticias del ayuntamiento
+- `anuncios` - Anuncios y avisos municipales
+- `eventos` - Eventos con streaming
+- `webcams` - Configuración de cámaras
 
-# Ejecutar tests en modo watch
-pnpm test -- --watch
+Ver [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) para SQL completo.
 
-# Ver cobertura
-pnpm test:coverage
-```
+## 🌐 Deploy en Vercel
 
-## Deploy en Vercel
+1. Conectar repo en Vercel
+2. Configurar variables de entorno
+3. Configurar dominio: `viveiro.live`
+4. Deploy automático en push a `main`
 
-### Opción 1: Deploy desde GitHub
+### Actualizar OAuth para producción
 
-1. Sube tu código a un repositorio de GitHub
-2. Importa el proyecto en [Vercel](https://vercel.com/new)
-3. Vercel detectará automáticamente Next.js y configurará el build
-4. Configura las variables de entorno necesarias
-5. Haz deploy
+Añadir redirect URLs en:
+- Google Cloud Console
+- Azure Portal (Microsoft)
+- Facebook Developers
+- Supabase Settings
 
-### Opción 2: Deploy con Vercel CLI
-
-```bash
-# Instalar Vercel CLI
-npm i -g vercel
-
-# Hacer deploy
-vercel
-```
-
-### Variables de entorno en Vercel
-
-Configura tus variables de entorno en el dashboard de Vercel:
-- Ve a tu proyecto → Settings → Environment Variables
-- Añade las variables necesarias:
-  - `NEXT_PUBLIC_SUPABASE_URL` - URL de tu proyecto Supabase
-  - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Anon key de Supabase
-  - `METEOGALICIA_API_KEY` - Tu API key de MeteoGalicia
-  - `NODE_ENV=production`
-
-## Configuración de TypeScript
-
-El proyecto usa configuración estricta de TypeScript. Puedes ajustar las opciones en [tsconfig.json](tsconfig.json).
-
-## Configuración de Tailwind CSS
-
-Personaliza los estilos en [tailwind.config.ts](tailwind.config.ts). Los estilos globales están en [app/globals.css](app/globals.css).
-
-## Buenas prácticas
-
-- Usa componentes de servidor por defecto (Server Components)
-- Añade `"use client"` solo cuando necesites interactividad
-- Organiza los componentes por feature en carpetas
-- Escribe tests para componentes críticos
-- Usa TypeScript para tipado fuerte
-- Sigue las convenciones de nombres de archivos de Next.js
-
-## Recursos
-
-- [Documentación de Next.js](https://nextjs.org/docs)
-- [Documentación de Tailwind CSS](https://tailwindcss.com/docs)
-- [Documentación de Vitest](https://vitest.dev/)
-- [Documentación de Vercel](https://vercel.com/docs)
+De: `http://localhost:3000/auth/callback`
+A: `https://viveiro.live/auth/callback`
 
 ## 🔒 Seguridad
 
-- **Supabase Auth** - Sistema de autenticación empresarial
-- **Cookies HttpOnly** - Tokens seguros (no accesibles desde JavaScript)
-- **Row Level Security (RLS)** - Políticas de seguridad a nivel de base de datos
-- **OAuth 2.0** - Autenticación con Google, Facebook, Apple
-- **Middleware de protección** - Rutas protegidas automáticamente
-- **Variables de entorno** - Credenciales seguras fuera del código
+- Supabase Auth con OAuth 2.0
+- Cookies HttpOnly (tokens seguros)
+- Row Level Security (RLS) en PostgreSQL
+- Middleware de protección de rutas
+- Variables de entorno fuera del código
+- HTTPS en producción
 
-## 🌍 Localización
+## 🧪 Testing
 
-- Idioma: Español (España)
-- Zona horaria: Europe/Madrid
-- Localización: Viveiro, Lugo, Galicia
+```bash
+pnpm test             # Ejecutar todos los tests
+pnpm test:ui          # Tests con interfaz visual
+pnpm test:coverage    # Ver cobertura de código
+```
+
+## 🤝 Contribución
+
+1. Fork del proyecto
+2. Crear rama: `git checkout -b feature/nueva-caracteristica`
+3. Commit: `git commit -m 'feat: Añadir nueva característica'`
+4. Push: `git push origin feature/nueva-caracteristica`
+5. Abrir Pull Request
+
+### Convención de Commits
+
+Seguimos [Conventional Commits](https://www.conventionalcommits.org/):
+
+- `feat:` Nueva característica
+- `fix:` Corrección de bug
+- `docs:` Documentación
+- `style:` Formato (sin cambio de código)
+- `refactor:` Refactorización
+- `test:` Tests
+- `chore:` Build, CI, etc.
 
 ## 📄 Licencia
 
-MIT License
+Este proyecto es de código abierto para uso municipal.
 
-## 👤 Autor
+## 👥 Equipo
 
-**landropunk**
+- **César Iglesias** ([@landropunk](https://github.com/landropunk)) - Desarrollo principal
+- **Ayuntamiento de Viveiro** - Cliente y sponsor
+
+## 🔗 Enlaces
+
+- **Portal**: https://viveiro.live
+- **Repositorio**: https://github.com/landropunk/viveiro-live
+- **Proyecto anterior**: [Meteo-Historicos-Viveiro](https://github.com/landropunk/Meteo-Historicos-Viveiro)
+- **MeteoGalicia API**: https://www.meteogalicia.gal/web/API/api.action
+
+## 📧 Contacto
+
+- Email: cesar.iglesiasDocal@gmail.com
 - GitHub: [@landropunk](https://github.com/landropunk)
-
-## 🤝 Contribuciones
-
-Las contribuciones son bienvenidas. Por favor:
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/amazing-feature`)
-3. Commit tus cambios (`git commit -m 'Add amazing feature'`)
-4. Push a la rama (`git push origin feature/amazing-feature`)
-5. Abre un Pull Request
-
-## 📝 Historial de Cambios
-
-Consulta el archivo [CHANGELOG.md](CHANGELOG.md) para ver un historial detallado de todos los cambios, mejoras y correcciones de errores del proyecto. Incluye:
-- ✨ Nuevas características añadidas
-- 🔧 Cambios en funcionalidades existentes
-- 🐛 Correcciones de bugs
-- 📚 Documentación e investigación técnica
-- 🗑️ Código eliminado o deprecado
-
-Todos los cambios están documentados en **español** con explicaciones detalladas.
 
 ---
 
-**Desarrollado con** ❤️ **usando Next.js y MeteoGalicia API**
-
-🤖 **Asistido por Claude Code**
+**v1.0.0** - Portal Municipal viveiro.live
+Migrado desde Meteo-Historicos-Viveiro - Octubre 2025
+🤖 Desarrollado con asistencia de [Claude Code](https://claude.com/claude-code)

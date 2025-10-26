@@ -1,7 +1,7 @@
 {
-  "name": "nextjs-autonomia",
-  "version": "0.1.0",
-  "description": "Next.js 14 project with TypeScript, Tailwind CSS and Vitest",
+  "name": "viveiro-live",
+  "version": "1.0.0",
+  "description": "Portal municipal de Viveiro - Meteorología, Eventos, Webcams y más",
   "private": true,
   "scripts": {
     "predev": "node scripts/kill-port.js 3000",
