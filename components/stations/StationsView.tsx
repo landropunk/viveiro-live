@@ -1,11 +1,25 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { StationObservation, StationComparisonTimeSeries } from '@/types/weather';
 import { VIVEIRO_STATIONS } from '@/lib/meteogalicia-stations';
 import StationSelector from './StationSelector';
 import StationDataCard from './StationDataCard';
 import StationComparisonChart from './StationComparisonChart';
+
+// Importación dinámica para evitar problemas con SSR de Leaflet
+const StationsMap = dynamic(() => import('./StationsMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-96 w-full items-center justify-center rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+      <div className="text-center">
+        <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500"></div>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Cargando mapa...</p>
+      </div>
+    </div>
+  ),
+});
 
 interface StationsData {
   observations: StationObservation[];
@@ -229,6 +243,25 @@ export default function StationsView() {
         selectedStations={selectedStations}
         onSelectionChange={setSelectedStations}
       />
+
+      {/* Mapa de estaciones */}
+      <div>
+        <h3 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+          Ubicación de las estaciones
+        </h3>
+        <StationsMap
+          stations={VIVEIRO_STATIONS}
+          selectedStations={selectedStations}
+          onStationClick={(stationId) => {
+            // Toggle selección al hacer clic en el mapa
+            if (selectedStations.includes(stationId)) {
+              setSelectedStations(selectedStations.filter(id => id !== stationId));
+            } else {
+              setSelectedStations([...selectedStations, stationId]);
+            }
+          }}
+        />
+      </div>
 
       {selectedStations.length > 0 && (
         <>
