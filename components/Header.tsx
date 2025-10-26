@@ -40,7 +40,7 @@ export default function Header({ showNavigation = true }: HeaderProps) {
         </Link>
 
         {/* Navigation */}
-        {showNavigation && (
+        {showNavigation && user && (
           <nav className="hidden md:flex md:items-center md:space-x-6">
             <Link
               href="/"
@@ -48,22 +48,12 @@ export default function Header({ showNavigation = true }: HeaderProps) {
             >
               Inicio
             </Link>
-            {user && (
-              <Link
-                href="/dashboard"
-                className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-              >
-                Dashboard
-              </Link>
-            )}
-            {!user && !loading && (
-              <Link
-                href="/auth/login"
-                className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-              >
-                Login
-              </Link>
-            )}
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            >
+              Dashboard
+            </Link>
           </nav>
         )}
 
