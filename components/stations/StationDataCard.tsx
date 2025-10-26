@@ -73,7 +73,7 @@ export default function StationDataCard({ station, observation }: StationDataCar
             </p>
           </div>
           <button
-            onClick={() => router.push(`/dashboard/station/${station.id}`)}
+            onClick={() => router.push(`/dashboard/meteo/station/${station.id}`)}
             className="px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 border border-blue-600 dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
           >
             Ver detalles
