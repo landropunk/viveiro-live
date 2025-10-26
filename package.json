@@ -1,0 +1,53 @@
+{
+  "name": "nextjs-autonomia",
+  "version": "0.1.0",
+  "description": "Next.js 14 project with TypeScript, Tailwind CSS and Vitest",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/kill-port.js 3000",
+    "dev": "next dev",
+    "dev:clean": "node scripts/kill-port.js 3000 && next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "kill-port": "node scripts/kill-port.js"
+  },
+  "packageManager": "pnpm@10.18.3",
+  "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@prisma/client": "^6.17.1",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.76.1",
+    "date-fns": "^4.1.0",
+    "jose": "^6.1.0",
+    "next": "^14.2.33",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^3.3.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/node": "^24.8.1",
+    "@types/react": "^18.3.26",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^5.0.4",
+    "autoprefixer": "^10.4.21",
+    "bcryptjs": "^3.0.2",
+    "eslint": "^9.37.0",
+    "eslint-config-next": "^15.5.6",
+    "jsdom": "^27.0.0",
+    "node-mocks-http": "^1.17.2",
+    "postcss": "^8.5.6",
+    "prisma": "^6.17.1",
+    "tailwindcss": "^3.4.18",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

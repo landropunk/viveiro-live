@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="512" height="512">
+  <!-- Fondo circular con gradiente azul -->
+  <defs>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2563EB;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cloudGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E5E7EB;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Círculo de fondo -->
+  <circle cx="100" cy="100" r="95" fill="url(#skyGradient)"/>
+
+  <!-- Sol (parcialmente cubierto por nubes) -->
+  <circle cx="100" cy="70" r="25" fill="#FCD34D" opacity="0.9"/>
+  <circle cx="100" cy="70" r="30" fill="#FCD34D" opacity="0.3"/>
+
+  <!-- Rayos de sol -->
+  <line x1="100" y1="30" x2="100" y2="20" stroke="#FCD34D" stroke-width="3" stroke-linecap="round"/>
+  <line x1="130" y1="45" x2="137" y2="38" stroke="#FCD34D" stroke-width="3" stroke-linecap="round"/>
+  <line x1="145" y1="70" x2="155" y2="70" stroke="#FCD34D" stroke-width="3" stroke-linecap="round"/>
+  <line x1="70" y1="45" x2="63" y2="38" stroke="#FCD34D" stroke-width="3" stroke-linecap="round"/>
+  <line x1="55" y1="70" x2="45" y2="70" stroke="#FCD34D" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Nube principal (estilo meteorológico) -->
+  <ellipse cx="75" cy="100" rx="25" ry="20" fill="url(#cloudGradient)"/>
+  <ellipse cx="95" cy="95" rx="30" ry="25" fill="url(#cloudGradient)"/>
+  <ellipse cx="115" cy="100" rx="25" ry="20" fill="url(#cloudGradient)"/>
+  <rect x="50" y="100" width="90" height="20" fill="url(#cloudGradient)"/>
+
+  <!-- Gotas de lluvia -->
+  <path d="M 70 125 Q 68 130 70 135 Q 72 130 70 125" fill="#3B82F6" opacity="0.7"/>
+  <path d="M 90 130 Q 88 135 90 140 Q 92 135 90 130" fill="#3B82F6" opacity="0.7"/>
+  <path d="M 110 125 Q 108 130 110 135 Q 112 130 110 125" fill="#3B82F6" opacity="0.7"/>
+  <path d="M 130 130 Q 128 135 130 140 Q 132 135 130 130" fill="#3B82F6" opacity="0.7"/>
+
+  <!-- Símbolo de termómetro (pequeño, abajo a la derecha) -->
+  <rect x="140" y="140" width="8" height="30" rx="4" fill="#EF4444" opacity="0.8"/>
+  <circle cx="144" cy="173" r="6" fill="#EF4444" opacity="0.8"/>
+  <rect x="142" y="145" width="4" height="20" fill="#DC2626"/>
+
+  <!-- Texto "V" estilizado (inicial de Viveiro) -->
+  <text x="100" y="170" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="white" text-anchor="middle" opacity="0.3">V</text>
+</svg>
