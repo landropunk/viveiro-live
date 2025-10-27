@@ -41,7 +41,7 @@ const sections: SectionLink[] = [
   },
   {
     id: 'live',
-    name: 'Live',
+    name: 'Live / Play',
     icon: <LiveIcon className="h-5 w-5" />,
     path: '/dashboard/eventos',
     enabled: true,
