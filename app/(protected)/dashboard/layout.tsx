@@ -22,9 +22,9 @@ const sections: SectionLink[] = [
     enabled: true,
   },
   {
-    id: 'eventos',
-    name: 'Eventos',
-    icon: '📅',
+    id: 'live',
+    name: 'Live',
+    icon: '🔴',
     path: '/dashboard/eventos',
     enabled: true,
   },
