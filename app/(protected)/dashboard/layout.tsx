@@ -13,21 +13,27 @@ type SectionLink = {
   enabled: boolean;
 };
 
-// Icono Live SVG profesional
+// Icono Live/Play SVG profesional - Estilo moderno con play button y ondas
 const LiveIcon = ({ className }: { className?: string }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
   >
-    <circle cx="12" cy="12" r="10" />
-    <circle cx="12" cy="12" r="3" fill="currentColor" />
-    <path d="M8 12a4 4 0 0 1 8 0" />
-    <path d="M6 12a6 6 0 0 1 12 0" />
+    {/* Botón Play central */}
+    <circle cx="12" cy="12" r="8" fill="currentColor" opacity="0.2" />
+    <path d="M10 8.5v7l6-3.5-6-3.5z" fill="currentColor" />
+
+    {/* Ondas de transmisión */}
+    <path
+      d="M2 12a10 10 0 0 1 2.93-7.07M22 12a10 10 0 0 0-2.93-7.07M2 12a10 10 0 0 0 2.93 7.07M22 12a10 10 0 0 1-2.93 7.07"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      fill="none"
+      opacity="0.6"
+    />
   </svg>
 );
 
