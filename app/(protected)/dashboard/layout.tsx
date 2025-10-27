@@ -8,10 +8,28 @@ import { useAuth } from '@/contexts/AuthContext';
 type SectionLink = {
   id: string;
   name: string;
-  icon: string;
+  icon: string | ReactNode;
   path: string;
   enabled: boolean;
 };
+
+// Icono Live SVG profesional
+const LiveIcon = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="10" />
+    <circle cx="12" cy="12" r="3" fill="currentColor" />
+    <path d="M8 12a4 4 0 0 1 8 0" />
+    <path d="M6 12a6 6 0 0 1 12 0" />
+  </svg>
+);
 
 const sections: SectionLink[] = [
   {
@@ -24,7 +42,7 @@ const sections: SectionLink[] = [
   {
     id: 'live',
     name: 'Live',
-    icon: '🔴',
+    icon: <LiveIcon className="h-5 w-5" />,
     path: '/dashboard/eventos',
     enabled: true,
   },
@@ -170,7 +188,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-400 opacity-50 dark:text-gray-600"
                   title="Próximamente disponible"
                 >
-                  <span className="mr-3 text-xl">{section.icon}</span>
+                  <span className={typeof section.icon === 'string' ? 'mr-3 text-xl' : 'mr-3'}>
+                    {section.icon}
+                  </span>
                   <span>{section.name}</span>
                   <span className="ml-auto text-xs">🔒</span>
                 </div>
@@ -191,7 +211,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   }
                 `}
               >
-                <span className="mr-3 text-xl">{section.icon}</span>
+                <span className={typeof section.icon === 'string' ? 'mr-3 text-xl' : 'mr-3'}>
+                  {section.icon}
+                </span>
                 <span>{section.name}</span>
               </Link>
             );
