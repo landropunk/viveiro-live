@@ -25,9 +25,9 @@ const sections: SectionType[] = [
   },
   {
     id: 'eventos',
-    name: 'Eventos en Directo',
-    description: 'Calendario de eventos municipales y streaming en vivo',
-    icon: '📅',
+    name: 'Live / Play',
+    description: 'Eventos en directo, retransmisiones y contenido multimedia',
+    icon: '🔴',
     path: '/dashboard/eventos',
     enabled: true,
   },
