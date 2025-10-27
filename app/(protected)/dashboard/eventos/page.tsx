@@ -58,24 +58,39 @@ export default function EventosPage() {
             Volver al portal
           </Link>
           <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
-            📅 Eventos en Directo
+            🔴 Live / Play
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Calendario de eventos municipales y streaming en vivo
+            Eventos en directo, retransmisiones y contenido multimedia
           </p>
         </div>
 
         {/* Coming Soon Card */}
         <div className="rounded-lg border border-gray-200 bg-white p-12 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-blue-50 text-6xl dark:bg-blue-900/30">
-            📅
+          <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-pink-600 text-6xl">
+            <svg
+              className="h-16 w-16 text-white"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <circle cx="12" cy="12" r="8" fill="currentColor" opacity="0.3" />
+              <path d="M10 8.5v7l6-3.5-6-3.5z" fill="currentColor" />
+              <path
+                d="M2 12a10 10 0 0 1 2.93-7.07M22 12a10 10 0 0 0-2.93-7.07M2 12a10 10 0 0 0 2.93 7.07M22 12a10 10 0 0 1-2.93 7.07"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                fill="none"
+                opacity="0.7"
+              />
+            </svg>
           </div>
           <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
             Próximamente disponible
           </h2>
           <p className="mb-8 text-gray-600 dark:text-gray-400">
-            Esta sección estará disponible próximamente. Aquí podrás consultar el calendario de eventos
-            municipales, ver streaming en directo de eventos y acceder a información detallada de cada evento.
+            Esta sección estará disponible próximamente. Aquí podrás ver eventos en directo,
+            acceder a retransmisiones, consultar el calendario de eventos municipales y reproducir contenido multimedia.
           </p>
 
           {/* Features Preview */}
@@ -85,21 +100,21 @@ export default function EventosPage() {
             </h3>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-900/50">
-                <div className="mb-2 text-2xl">📆</div>
+                <div className="mb-2 text-2xl">🔴</div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Calendario de eventos
+                  Eventos en directo
                 </p>
               </div>
               <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-900/50">
-                <div className="mb-2 text-2xl">🎥</div>
+                <div className="mb-2 text-2xl">▶️</div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Streaming en directo
+                  Contenido on-demand
                 </p>
               </div>
               <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-900/50">
-                <div className="mb-2 text-2xl">ℹ️</div>
+                <div className="mb-2 text-2xl">📅</div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Información detallada
+                  Calendario municipal
                 </p>
               </div>
             </div>
