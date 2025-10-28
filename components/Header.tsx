@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from '@/contexts/AuthContext';
+import ViveiroLogo from './ViveiroLogo';
 
 interface HeaderProps {
   showNavigation?: boolean;
@@ -18,21 +19,9 @@ export default function Header({ showNavigation = true }: HeaderProps) {
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/80">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600">
-            <svg
-              className="h-5 w-5 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-              />
-            </svg>
+        <Link href="/" className="flex items-center space-x-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-red-600 to-red-700 p-1.5 shadow-md">
+            <ViveiroLogo className="h-full w-full text-white" />
           </div>
           <span className="text-xl font-bold text-gray-900 dark:text-white">
             viveiro.live

@@ -4,6 +4,7 @@ import { ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import ViveiroLogo from '@/components/ViveiroLogo';
 
 type SectionLink = {
   id: string;
@@ -108,21 +109,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       >
         {/* Logo/Header */}
         <div className="flex h-16 items-center justify-between border-b border-gray-200 px-6 dark:border-gray-800">
-          <Link href="/dashboard" className="flex items-center space-x-2" onClick={closeSidebar}>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600">
-              <svg
-                className="h-5 w-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                />
-              </svg>
+          <Link href="/dashboard" className="flex items-center space-x-3" onClick={closeSidebar}>
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-red-600 to-red-700 p-1.5 shadow-md">
+              <ViveiroLogo className="h-full w-full text-white" />
             </div>
             <span className="text-lg font-bold text-gray-900 dark:text-white">
               viveiro.live
@@ -288,21 +277,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </button>
 
               {/* Logo en móvil */}
-              <Link href="/dashboard" className="flex items-center space-x-2 lg:hidden">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600">
-                  <svg
-                    className="h-5 w-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                    />
-                  </svg>
+              <Link href="/dashboard" className="flex items-center space-x-3 lg:hidden">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-red-600 to-red-700 p-1.5 shadow-md">
+                  <ViveiroLogo className="h-full w-full text-white" />
                 </div>
                 <span className="text-lg font-bold text-gray-900 dark:text-white">
                   viveiro.live
