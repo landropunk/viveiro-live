@@ -20,7 +20,7 @@ export default function Header({ showNavigation = true }: HeaderProps) {
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-red-600 to-red-700 p-1.5 shadow-md">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 p-2">
             <ViveiroLogo className="h-full w-full text-white" />
           </div>
           <span className="text-xl font-bold text-gray-900 dark:text-white">

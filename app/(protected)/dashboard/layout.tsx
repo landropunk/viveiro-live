@@ -110,7 +110,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {/* Logo/Header */}
         <div className="flex h-16 items-center justify-between border-b border-gray-200 px-6 dark:border-gray-800">
           <Link href="/dashboard" className="flex items-center space-x-3" onClick={closeSidebar}>
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-red-600 to-red-700 p-1.5 shadow-md">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 p-2">
               <ViveiroLogo className="h-full w-full text-white" />
             </div>
             <span className="text-lg font-bold text-gray-900 dark:text-white">
@@ -278,7 +278,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
               {/* Logo en móvil */}
               <Link href="/dashboard" className="flex items-center space-x-3 lg:hidden">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-red-600 to-red-700 p-1.5 shadow-md">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 p-2">
                   <ViveiroLogo className="h-full w-full text-white" />
                 </div>
                 <span className="text-lg font-bold text-gray-900 dark:text-white">
