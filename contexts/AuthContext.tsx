@@ -76,8 +76,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut()
-    router.push('/')
-    router.refresh()
+    // Usar window.location para forzar navegación completa a inicio
+    window.location.href = '/'
   }
 
   const signInWithGoogle = async (forceAccountSelection = false) => {

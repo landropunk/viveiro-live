@@ -4,82 +4,50 @@ import { ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsAdmin } from '@/hooks/useIsAdmin';
 
-type SectionLink = {
+type AdminLink = {
   id: string;
   name: string;
-  icon: string | ReactNode;
+  icon: string;
   path: string;
-  enabled: boolean;
 };
 
-// Icono Live/Play SVG profesional - Estilo moderno con play button y ondas
-const LiveIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    {/* Botón Play central */}
-    <circle cx="12" cy="12" r="8" fill="currentColor" opacity="0.2" />
-    <path d="M10 8.5v7l6-3.5-6-3.5z" fill="currentColor" />
-
-    {/* Ondas de transmisión */}
-    <path
-      d="M2 12a10 10 0 0 1 2.93-7.07M22 12a10 10 0 0 0-2.93-7.07M2 12a10 10 0 0 0 2.93 7.07M22 12a10 10 0 0 1-2.93 7.07"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      fill="none"
-      opacity="0.6"
-    />
-  </svg>
-);
-
-const sections: SectionLink[] = [
+const adminLinks: AdminLink[] = [
   {
-    id: 'meteo',
-    name: 'Meteorología',
-    icon: '☁️',
-    path: '/dashboard/meteo',
-    enabled: true,
-  },
-  {
-    id: 'historicos',
-    name: 'Históricos Horarios',
+    id: 'dashboard',
+    name: 'Panel Principal',
     icon: '📊',
-    path: '/dashboard/historicos',
-    enabled: true,
+    path: '/admin',
   },
   {
-    id: 'live',
-    name: 'Live / Play',
-    icon: <LiveIcon className="h-5 w-5" />,
-    path: '/dashboard/eventos',
-    enabled: true,
+    id: 'blog',
+    name: 'Blog / Noticias',
+    icon: '📝',
+    path: '/admin/blog',
   },
   {
     id: 'webcams',
     name: 'Webcams',
     icon: '📷',
-    path: '/dashboard/webcams',
-    enabled: true,
+    path: '/admin/webcams',
   },
   {
-    id: 'seccion4',
-    name: 'Sección 4',
-    icon: '🔧',
-    path: '/dashboard/seccion4',
-    enabled: false,
+    id: 'live-content',
+    name: 'Live / Play',
+    icon: '📺',
+    path: '/admin/live-content',
+  },
+  {
+    id: 'users',
+    name: 'Usuarios',
+    icon: '👥',
+    path: '/admin/users',
   },
 ];
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
-  const isAdmin = useIsAdmin();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -110,8 +78,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       >
         {/* Logo/Header */}
         <div className="flex h-16 items-center justify-between border-b border-gray-200 px-6 dark:border-gray-800">
-          <Link href="/dashboard" className="flex items-center gap-3" onClick={closeSidebar}>
-            {/* Escudo con bandera circular */}
+          <Link href="/admin" className="flex items-center gap-3" onClick={closeSidebar}>
             <div
               style={{
                 width: "40px",
@@ -120,7 +87,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 flexShrink: 0
               }}
             >
-              {/* Bandera como fondo circular */}
               <img
                 src="/banderaViveiro.jpg"
                 alt="Bandera de Viveiro"
@@ -132,7 +98,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   display: "block"
                 }}
               />
-              {/* Escudo encima centrado */}
               <img
                 src="/Escudo_de_Viveiro.png"
                 alt="Escudo de Viveiro"
@@ -148,9 +113,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 }}
               />
             </div>
-            <span className="text-lg font-bold text-gray-900 dark:text-white">
-              viveiro.live
-            </span>
+            <div className="flex flex-col">
+              <span className="text-sm font-bold text-gray-900 dark:text-white">
+                viveiro.live
+              </span>
+              <span className="text-xs text-red-600 dark:text-red-400 font-semibold">
+                ADMIN
+              </span>
+            </div>
           </Link>
 
           {/* Botón cerrar en móvil */}
@@ -177,86 +147,48 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1 px-3 py-4">
-          {/* Home Pública */}
+          {/* Links de regreso */}
           <Link
             href="/"
             onClick={closeSidebar}
             className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
           >
             <span className="mr-3 text-xl">🌐</span>
-            <span>Inicio</span>
+            <span>Inicio Público</span>
           </Link>
 
-          {/* Mi Espacio Home */}
           <Link
             href="/dashboard"
             onClick={closeSidebar}
-            className={`
-              flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors
-              ${
-                pathname === '/dashboard'
-                  ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
-                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-              }
-            `}
+            className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
           >
             <span className="mr-3 text-xl">🏠</span>
             <span>Mi Espacio</span>
           </Link>
 
-          {/* Admin Access */}
-          {isAdmin && (
-            <Link
-              href="/admin"
-              onClick={closeSidebar}
-              className="flex items-center rounded-lg px-3 py-2 text-sm font-medium bg-red-50 text-red-700 transition-colors hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
-            >
-              <span className="mr-3 text-xl">⚙️</span>
-              <span>Panel Admin</span>
-            </Link>
-          )}
-
           {/* Divider */}
           <div className="my-3 border-t border-gray-200 dark:border-gray-800"></div>
 
-          {/* Sections */}
-          {sections.map((section) => {
-            const isActive = pathname?.startsWith(section.path);
-
-            if (!section.enabled) {
-              return (
-                <div
-                  key={section.id}
-                  className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-400 opacity-50 dark:text-gray-600"
-                  title="Próximamente disponible"
-                >
-                  <span className={typeof section.icon === 'string' ? 'mr-3 text-xl' : 'mr-3'}>
-                    {section.icon}
-                  </span>
-                  <span>{section.name}</span>
-                  <span className="ml-auto text-xs">🔒</span>
-                </div>
-              );
-            }
+          {/* Admin Sections */}
+          {adminLinks.map((link) => {
+            const isActive = pathname === link.path || (link.path !== '/admin' && pathname?.startsWith(link.path));
 
             return (
               <Link
-                key={section.id}
-                href={section.path}
+                key={link.id}
+                href={link.path}
                 onClick={closeSidebar}
                 className={`
                   flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors
                   ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+                      ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                   }
                 `}
               >
-                <span className={typeof section.icon === 'string' ? 'mr-3 text-xl' : 'mr-3'}>
-                  {section.icon}
-                </span>
-                <span>{section.name}</span>
+                <span className="mr-3 text-xl">{link.icon}</span>
+                <span>{link.name}</span>
               </Link>
             );
           })}
@@ -265,12 +197,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {/* User Info & Logout (Bottom) */}
         <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 p-4 dark:border-gray-800">
           <div className="mb-3 flex items-center space-x-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-              {user?.email?.charAt(0).toUpperCase() || 'U'}
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-sm font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
+              {user?.email?.charAt(0).toUpperCase() || 'A'}
             </div>
             <div className="flex-1 overflow-hidden">
               <p className="truncate text-xs font-medium text-gray-900 dark:text-white">
                 {user?.email}
+              </p>
+              <p className="text-xs text-red-600 dark:text-red-400">
+                Administrador
               </p>
             </div>
           </div>
@@ -324,8 +259,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </button>
 
               {/* Logo en móvil */}
-              <Link href="/dashboard" className="flex items-center gap-3 lg:hidden">
-                {/* Escudo con bandera circular */}
+              <Link href="/admin" className="flex items-center gap-3 lg:hidden">
                 <div
                   style={{
                     width: "40px",
@@ -334,7 +268,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     flexShrink: 0
                   }}
                 >
-                  {/* Bandera como fondo circular */}
                   <img
                     src="/banderaViveiro.jpg"
                     alt="Bandera de Viveiro"
@@ -346,7 +279,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                       display: "block"
                     }}
                   />
-                  {/* Escudo encima centrado */}
                   <img
                     src="/Escudo_de_Viveiro.png"
                     alt="Escudo de Viveiro"
@@ -362,9 +294,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     }}
                   />
                 </div>
-                <span className="text-lg font-bold text-gray-900 dark:text-white">
-                  viveiro.live
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-gray-900 dark:text-white">
+                    viveiro.live
+                  </span>
+                  <span className="text-xs text-red-600 dark:text-red-400 font-semibold">
+                    ADMIN
+                  </span>
+                </div>
               </Link>
             </div>
 
@@ -378,7 +315,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </header>
 
         {/* Page Content */}
-        <main>{children}</main>
+        <main className="p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

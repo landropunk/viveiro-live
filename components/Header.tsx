@@ -1,15 +1,17 @@
 'use client';
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from '@/contexts/AuthContext';
-import ViveiroLogo from './ViveiroLogo';
 
 interface HeaderProps {
   showNavigation?: boolean;
+  showLogo?: boolean;
 }
 
-export default function Header({ showNavigation = true }: HeaderProps) {
+export default function Header({ showNavigation = true, showLogo = true }: HeaderProps) {
   const { user, loading, signOut } = useAuth();
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     await signOut();
@@ -18,30 +20,77 @@ export default function Header({ showNavigation = true }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/80">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link href="/" className="flex items-center space-x-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 p-2">
-            <ViveiroLogo className="h-full w-full text-white" />
-          </div>
-          <span className="text-xl font-bold text-gray-900 dark:text-white">
-            viveiro.live
-          </span>
-        </Link>
+        {/* Logo - solo si showLogo es true */}
+        {showLogo && (
+          <Link href="/" className="flex items-center gap-3">
+            {/* Escudo con bandera circular */}
+            <div
+              style={{
+                width: "48px",
+                height: "48px",
+                position: "relative",
+                flexShrink: 0
+              }}
+            >
+              {/* Bandera como fondo circular */}
+              <img
+                src="/banderaViveiro.jpg"
+                alt="Bandera de Viveiro"
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  display: "block"
+                }}
+              />
+              {/* Escudo encima centrado */}
+              <img
+                src="/Escudo_de_Viveiro.png"
+                alt="Escudo de Viveiro"
+                style={{
+                  width: "auto",
+                  height: "40px",
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  display: "block",
+                  filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))"
+                }}
+              />
+            </div>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">
+              viveiro.live
+            </span>
+          </Link>
+        )}
+
+        {/* Espacio vacío si no hay logo */}
+        {!showLogo && <div></div>}
 
         {/* Navigation */}
         {showNavigation && user && (
           <nav className="hidden md:flex md:items-center md:space-x-6">
             <Link
               href="/"
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+              className={`text-sm font-medium transition-colors ${
+                pathname === '/'
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+              }`}
             >
               Inicio
             </Link>
             <Link
               href="/dashboard"
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+              className={`text-sm font-medium transition-colors ${
+                pathname?.startsWith('/dashboard')
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+              }`}
             >
-              Dashboard
+              Mi Espacio
             </Link>
           </nav>
         )}

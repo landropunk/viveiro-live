@@ -277,6 +277,7 @@ function transformMeteoGaliciaData(apiData: any): WeatherForecast {
 
 /**
  * Obtiene el nombre del estado del cielo en español
+ * Actualizado 2024: Catálogo ampliado con 8 nuevas opciones
  */
 export function getSkyStateName(code: string): string {
   const skyStates: Record<string, string> = {
@@ -296,6 +297,17 @@ export function getSkyStateName(code: string): string {
     'SNOW': 'Nieve',
     'FOG': 'Niebla',
     'MIST': 'Neblina',
+
+    // Nuevos iconos 2024 (basado en actualización MeteoGalicia)
+    'WEAK_SNOW': 'Nieve débil',
+    'SNOW_SHOWERS': 'Chubascos de nieve',
+    'SLEET': 'Aguanieve',
+    'HAIL': 'Granizo',
+    'THUNDERSTORM': 'Tormenta eléctrica',
+    'FREEZING_RAIN': 'Lluvia engelante',
+    'SANDSTORM': 'Tormenta de arena',
+    'DUST': 'Polvo en suspensión',
+
     // Códigos numéricos (legacy)
     '1': 'Despejado',
     '2': 'Poco nublado',
@@ -308,6 +320,10 @@ export function getSkyStateName(code: string): string {
     '9': 'Lluvia',
     '10': 'Tormenta',
     '11': 'Nieve',
+    '12': 'Aguanieve',
+    '13': 'Granizo',
+    '14': 'Tormenta eléctrica',
+    '15': 'Lluvia engelante',
   };
 
   return skyStates[code] || code;

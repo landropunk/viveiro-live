@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function RegisterPage() {
@@ -53,7 +52,6 @@ export default function RegisterPage() {
 
   return (
     <>
-      <Header />
       <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4 dark:from-gray-950 dark:to-gray-900">
         <div className="w-full max-w-md">
           <div className="rounded-2xl bg-white p-8 shadow-lg dark:bg-gray-950 dark:ring-1 dark:ring-gray-800">

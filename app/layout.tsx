@@ -6,8 +6,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Meteorología Viveiro",
-  description: "Información meteorológica en tiempo real de Viveiro, Lugo - Datos de MeteoGalicia",
+  title: "ViveiroLive",
+  description: "Tu portal de Viveiro - Meteorología en tiempo real, contenido en directo, webcams y más servicios de Viveiro (Lugo, España)",
 };
 
 export default function RootLayout({
@@ -16,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body className={inter.className}>
+    <html lang="es" className="bg-gray-50 dark:bg-gray-900">
+      <body className={`${inter.className} bg-gray-50 dark:bg-gray-900`} style={{ backgroundColor: '#f9fafb' }}>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

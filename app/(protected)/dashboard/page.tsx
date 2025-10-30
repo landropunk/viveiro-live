@@ -91,7 +91,7 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="mb-12 text-center">
           <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">
-            Portal Municipal de Viveiro
+            Mi Espacio
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
             Bienvenido/a, {user.email}

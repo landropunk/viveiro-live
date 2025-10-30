@@ -3,21 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
   --foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
     --foreground: #ededed;
   }
 }
 
+html {
+  background-color: #f9fafb !important;
+}
+
 body {
   color: var(--foreground);
-  background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  background-color: #f9fafb !important;
+  min-height: 100vh;
+}
+
+@media (prefers-color-scheme: dark) {
+  html, body {
+    background-color: #111827 !important;
+  }
 }
 
 @layer utilities {

@@ -51,6 +51,23 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Proteger rutas de administración
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/auth/login'
+      return NextResponse.redirect(url)
+    }
+
+    // Verificar que el usuario es admin
+    const isAdmin = user.user_metadata?.role === 'admin'
+    if (!isAdmin) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
+      return NextResponse.redirect(url)
+    }
+  }
+
   // Redirigir usuarios autenticados de páginas de auth
   if (user && (request.nextUrl.pathname.startsWith('/auth/login') || request.nextUrl.pathname.startsWith('/auth/register'))) {
     const url = request.nextUrl.clone()
