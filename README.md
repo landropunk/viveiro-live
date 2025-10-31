@@ -32,14 +32,16 @@ ViveiroLive es un portal web moderno que centraliza información meteorológica,
 - Datos directos de las estaciones meteorológicas de MeteoGalicia
 - Comparación entre estaciones de Viveiro
 
-### 📝 Blog / Noticias
+### 📝 Blog / Noticias ⭐ REDISEÑADO
 - Sistema de gestión de contenido (CMS) completo
+- **Layout apilado vertical** con tarjetas horizontales
+- Diseño responsive: imagen izquierda (desktop) / arriba (móvil)
 - Editor con soporte **Markdown**
 - Categorías y etiquetas
 - Sistema de publicación/despublicación
 - SEO-friendly con slugs automáticos
-- Contador de visitas
-- Imágenes de portada
+- Imágenes de portada optimizadas
+- **Documentación completa**: [BLOG_SYSTEM.md](BLOG_SYSTEM.md)
 
 ### 📺 Live / Play
 - Contenido en directo y grabaciones de eventos
@@ -53,17 +55,22 @@ ViveiroLive es un portal web moderno que centraliza información meteorológica,
 
 ### ⚙️ Panel de Administración ⭐ MEJORADO
 - **Sistema de Ajustes Dinámicos** ✅ NUEVO - Configuración sin tocar código
-  - Activar/desactivar secciones del dashboard
+  - Activar/desactivar secciones del dashboard (6 secciones disponibles)
   - Control de registro de usuarios
   - Mostrar/ocultar blog en página principal
+  - **Secciones 5 y 6** preparadas para expansión futura 🔒
   - Funciones bloqueables con candado 🔒 (requieren activación en código)
+  - Ordenamiento inteligente de secciones
 - **Gestión completa de blog/noticias** ✅
 - **Gestión de webcams** (próximamente)
 - **Gestión de contenido Live/Play** (próximamente)
 - **Gestión de usuarios** (próximamente)
 - Sistema de roles (admin/user)
 - Protección con middleware y RLS de Supabase
-- **Documentación completa**: [AJUSTES_FUNCIONAMIENTO.md](AJUSTES_FUNCIONAMIENTO.md)
+- **Documentación completa**:
+  - [AJUSTES_FUNCIONAMIENTO.md](AJUSTES_FUNCIONAMIENTO.md)
+  - [ADMIN_SETTINGS.md](ADMIN_SETTINGS.md)
+  - [BLOG_SYSTEM.md](BLOG_SYSTEM.md)
 
 ---
 

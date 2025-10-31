@@ -4,6 +4,90 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 
+## [No publicado] - 2025-01-31
+
+### ✨ Añadido - Sistema de Secciones Configurables y Blog Rediseñado
+
+#### 🎛️ Sistema de Ajustes de Aplicación
+**Secciones 5 y 6 Preparadas para Expansión**
+- ✅ Agregadas secciones 5 y 6 como ajustes bloqueados en base de datos
+- ✅ Configuradas con `locked: true` para indicar que requieren implementación
+- ✅ Páginas placeholder creadas con instrucciones de personalización
+- ✅ Iconos asignados: 🔧 (Sección 5) y 📋 (Sección 6)
+- ✅ Integradas en dashboard layout y página Mi Espacio
+- ✅ Aparecen en `/admin/settings` con badge 🔒 Bloqueado
+- ✅ Controles deshabilitados hasta implementación
+
+**Ordenamiento Mejorado de Secciones**
+- ✅ Implementado ordenamiento personalizado en `/admin/settings`
+- ✅ Orden correcto: Meteorología → Históricos → Live/Play → Webcams → Sección 5 → Sección 6
+- ✅ Array `sectionOrder` para mantener jerarquía visual consistente
+
+**Archivos Creados/Modificados**:
+- `supabase/migrations/20250131_add_sections_5_6.sql` - Migración inicial (revertida)
+- `supabase/migrations/20250131_rename_sections_5_6.sql` - Migración correcta
+- `app/(protected)/dashboard/seccion5/page.tsx` - Página placeholder sección 5
+- `app/(protected)/dashboard/seccion6/page.tsx` - Página placeholder sección 6
+- `hooks/useDashboardConfig.ts` - Actualizado con seccion5 y seccion6
+- `app/(protected)/dashboard/layout.tsx` - Menú con secciones 5 y 6
+- `app/(protected)/dashboard/page.tsx` - Mi Espacio con secciones 5 y 6
+- `app/(admin)/admin/settings/page.tsx` - Ordenamiento personalizado
+
+#### 📝 Rediseño Completo del Blog
+
+**Nuevo Layout Apilado Vertical**
+- ✅ Cambio de grid 3 columnas a layout vertical apilado
+- ✅ Diseño horizontal: imagen izquierda (320px), contenido derecha
+- ✅ Posts se apilan uno debajo del otro (más recientes arriba)
+- ✅ Título de sección: "Blog" (centrado, text-4xl)
+- ✅ Título de posts aumentado a text-2xl para mejor legibilidad
+- ✅ Excerpt completo sin límite de líneas
+- ✅ Animación hover más sutil (scale 1.01, y: -2px)
+- ✅ Responsive: vertical en móvil, horizontal en desktop
+
+**Mejoras Visuales**
+- ✅ Imagen con altura completa en desktop
+- ✅ Contenido con flex-1 para usar espacio disponible
+- ✅ Mejor espaciado y jerarquía visual
+- ✅ Transiciones suaves en hover
+- ✅ Zoom en imagen al pasar cursor
+
+**Archivos Modificados**:
+- `app/(public)/page.tsx` - Rediseño completo de sección blog
+- `BLOG_SYSTEM.md` - Documentación completa del sistema (NUEVO)
+
+#### 📚 Documentación
+
+**Nuevos Documentos**:
+- `BLOG_SYSTEM.md` - Guía completa del sistema de blog
+  - Diseño y presentación
+  - Gestión de posts
+  - Control de visibilidad
+  - Personalización
+  - Troubleshooting
+  - Roadmap de funcionalidades
+
+**Actualizaciones**:
+- `CHANGELOG.md` - Este archivo con registro de cambios
+
+### 🐛 Correcciones
+
+**Numeración de Secciones**
+- 🔧 Corregida numeración de secciones adicionales (eran 4 y 5, ahora 5 y 6)
+- 🔧 Históricos Horarios correctamente identificado como sección 4
+
+**Visualización del Blog**
+- 🔧 Intentos fallidos de expandir ancho (revertidos)
+- ✅ Solución final: layout apilado vertical con tarjetas horizontales
+
+### 📊 Estadísticas de Cambios
+
+- **Archivos nuevos**: 3 (2 páginas + 1 doc)
+- **Migraciones SQL**: 2
+- **Archivos modificados**: 5
+- **Commits**: 7
+- **Líneas documentación**: ~300
+
 ## [No publicado] - 2025-10-26
 
 ### 🔐 Migración Completa a Supabase Auth y Limpieza de Código
