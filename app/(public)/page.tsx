@@ -315,9 +315,9 @@ export default function Home() {
           {/* Blog / Noticias */}
           {blogEnabled && !loadingPosts && blogPosts.length > 0 && (
             <AnimatedSection className="mt-20">
-              <div className="mb-8 flex items-center justify-between">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  Noticias y Novedades
+              <div className="mb-12 text-center">
+                <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
+                  Blog
                 </h2>
               </div>
               <motion.div
@@ -325,7 +325,7 @@ export default function Home() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
-                className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-3"
               >
                 {blogPosts.map((post) => (
                   <Link key={post.id} href={`/blog/${post.slug}`}>
