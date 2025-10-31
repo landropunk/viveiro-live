@@ -43,6 +43,12 @@ const adminLinks: AdminLink[] = [
     icon: '👥',
     path: '/admin/users',
   },
+  {
+    id: 'settings',
+    name: 'Ajustes',
+    icon: '⚙️',
+    path: '/admin/settings',
+  },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
