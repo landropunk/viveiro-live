@@ -325,7 +325,7 @@ export default function Home() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
-                className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                className="grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-3"
               >
                 {blogPosts.map((post) => (
                   <Link key={post.id} href={`/blog/${post.slug}`}>
