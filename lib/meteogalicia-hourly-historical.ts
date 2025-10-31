@@ -66,7 +66,7 @@ export async function getHourlyHistoricalData(
 ): Promise<HourlyStationData[]> {
   try {
     const url = new URL(METEOGALICIA_HOURLY_HISTORICAL);
-    url.searchParams.append('dataIni', encodeURIComponent(params.startDateTime));
+    url.searchParams.append('dataIni', params.startDateTime); // No hacer encode adicional, URL lo hace automáticamente
     url.searchParams.append('numHoras', params.numHours.toString());
     url.searchParams.append('idEst', params.stationId.toString());
 

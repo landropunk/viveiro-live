@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getLastHoursData, type HourlyStationData } from '@/lib/meteogalicia-hourly-historical';
+import { type HourlyStationData } from '@/lib/meteogalicia-hourly-historical';
 import { VIVEIRO_STATIONS } from '@/lib/meteogalicia-stations';
 import {
   LineChart,
@@ -31,8 +31,23 @@ export default function HistoricosPage() {
     try {
       setLoading(true);
       setError(null);
-      const historicalData = await getLastHoursData(selectedHours);
-      setData(historicalData);
+
+      // Llamar a la API en lugar de la función directamente
+      const response = await fetch(`/api/protected/historicos?hours=${selectedHours}`);
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Convertir el objeto a Map
+      const dataMap = new Map<number, HourlyStationData[]>();
+      Object.entries(result).forEach(([key, value]) => {
+        dataMap.set(parseInt(key), value as HourlyStationData[]);
+      });
+
+      setData(dataMap);
     } catch (err) {
       console.error('Error cargando datos históricos:', err);
       setError('Error al cargar los datos históricos');
