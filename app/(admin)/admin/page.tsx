@@ -13,6 +13,13 @@ type AdminCard = {
 
 const adminCards: AdminCard[] = [
   {
+    title: 'Ajustes de la Aplicación',
+    description: 'Configura secciones, características y opciones generales',
+    icon: '⚙️',
+    href: '/admin/settings',
+    color: 'from-gray-500 to-slate-500',
+  },
+  {
     title: 'Blog / Noticias',
     description: 'Gestiona artículos y noticias para la página de inicio',
     icon: '📝',

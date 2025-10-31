@@ -51,13 +51,19 @@ ViveiroLive es un portal web moderno que centraliza información meteorológica,
 - Vista en cuadrícula y pantalla completa
 - Gestión administrativa de cámaras (en desarrollo)
 
-### ⚙️ Panel de Administración
+### ⚙️ Panel de Administración ⭐ MEJORADO
+- **Sistema de Ajustes Dinámicos** ✅ NUEVO - Configuración sin tocar código
+  - Activar/desactivar secciones del dashboard
+  - Control de registro de usuarios
+  - Mostrar/ocultar blog en página principal
+  - Funciones bloqueables con candado 🔒 (requieren activación en código)
 - **Gestión completa de blog/noticias** ✅
 - **Gestión de webcams** (próximamente)
 - **Gestión de contenido Live/Play** (próximamente)
 - **Gestión de usuarios** (próximamente)
 - Sistema de roles (admin/user)
 - Protección con middleware y RLS de Supabase
+- **Documentación completa**: [AJUSTES_FUNCIONAMIENTO.md](AJUSTES_FUNCIONAMIENTO.md)
 
 ---
 

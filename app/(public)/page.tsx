@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import AnimatedSection from "@/components/AnimatedSection";
 import { useAuth } from "@/contexts/AuthContext";
 import { getPublishedBlogPosts, type BlogPost } from "@/lib/admin/blog";
+import { createClient } from "@/lib/supabase/client";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -32,8 +33,26 @@ export default function Home() {
   const { user } = useAuth();
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
+  const [blogEnabled, setBlogEnabled] = useState(true);
 
   useEffect(() => {
+    const loadBlogConfig = async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('app_settings')
+          .select('value')
+          .eq('key', 'feature_blog')
+          .single();
+
+        if (data) {
+          setBlogEnabled(data.value?.enabled === true);
+        }
+      } catch (error) {
+        console.error('Error loading blog config:', error);
+      }
+    };
+
     const loadBlogPosts = async () => {
       try {
         const posts = await getPublishedBlogPosts(3); // Últimos 3 posts
@@ -45,6 +64,7 @@ export default function Home() {
       }
     };
 
+    loadBlogConfig();
     loadBlogPosts();
   }, []);
 
@@ -275,7 +295,7 @@ export default function Home() {
           </AnimatedSection>
 
           {/* Blog / Noticias */}
-          {!loadingPosts && blogPosts.length > 0 && (
+          {blogEnabled && !loadingPosts && blogPosts.length > 0 && (
             <AnimatedSection className="mt-20">
               <div className="mb-8 flex items-center justify-between">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white">

@@ -1,10 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { createClient } from '@/lib/supabase/client';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const { signUp, signInWithGoogle, signInWithFacebook, signInWithMicrosoft } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
@@ -15,6 +18,39 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [registrationEnabled, setRegistrationEnabled] = useState(true);
+  const [checkingConfig, setCheckingConfig] = useState(true);
+
+  useEffect(() => {
+    const checkRegistrationEnabled = async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('app_settings')
+          .select('value')
+          .eq('key', 'feature_user_registration')
+          .single();
+
+        if (data) {
+          const enabled = data.value?.enabled === true;
+          setRegistrationEnabled(enabled);
+
+          if (!enabled) {
+            // Si el registro está deshabilitado, redirigir al login
+            setTimeout(() => {
+              router.push('/auth/login');
+            }, 3000);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking registration config:', error);
+      } finally {
+        setCheckingConfig(false);
+      }
+    };
+
+    checkRegistrationEnabled();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +85,52 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  // Si está verificando configuración, mostrar loading
+  if (checkingConfig) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4 dark:from-gray-950 dark:to-gray-900">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Cargando...</p>
+        </div>
+      </main>
+    );
+  }
+
+  // Si el registro está deshabilitado, mostrar mensaje
+  if (!registrationEnabled) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4 dark:from-gray-950 dark:to-gray-900">
+        <div className="w-full max-w-md">
+          <div className="rounded-2xl bg-white p-8 shadow-lg dark:bg-gray-950 dark:ring-1 dark:ring-gray-800">
+            <div className="mb-6 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/30">
+                <svg className="h-8 w-8 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+                Registro Deshabilitado
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                El registro de nuevos usuarios está temporalmente deshabilitado.
+              </p>
+              <p className="mt-4 text-sm text-gray-500 dark:text-gray-500">
+                Redirigiendo a la página de inicio de sesión...
+              </p>
+            </div>
+            <Link
+              href="/auth/login"
+              className="block w-full rounded-lg bg-blue-600 px-4 py-3 text-center font-medium text-white transition-all hover:bg-blue-700"
+            >
+              Ir a Iniciar Sesión
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <>

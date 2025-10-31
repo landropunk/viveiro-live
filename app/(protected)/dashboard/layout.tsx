@@ -1,10 +1,11 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { useDashboardConfig } from '@/hooks/useDashboardConfig';
 
 type SectionLink = {
   id: string;
@@ -38,20 +39,21 @@ const LiveIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const sections: SectionLink[] = [
+// Definición base de secciones (estructura fija)
+const baseSections: SectionLink[] = [
   {
     id: 'meteo',
     name: 'Meteorología',
     icon: '☁️',
     path: '/dashboard/meteo',
-    enabled: true,
+    enabled: true, // Por defecto, se sobrescribe con configuración
   },
   {
     id: 'historicos',
     name: 'Históricos Horarios',
     icon: '📊',
     path: '/dashboard/historicos',
-    enabled: true,
+    enabled: false,
   },
   {
     id: 'live',
@@ -67,13 +69,6 @@ const sections: SectionLink[] = [
     path: '/dashboard/webcams',
     enabled: true,
   },
-  {
-    id: 'seccion4',
-    name: 'Sección 4',
-    icon: '🔧',
-    path: '/dashboard/seccion4',
-    enabled: false,
-  },
 ];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
@@ -81,6 +76,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
   const isAdmin = useIsAdmin();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { config, loading: configLoading } = useDashboardConfig();
+
+  // Aplicar configuración dinámica a las secciones
+  const sections = useMemo(() => {
+    return baseSections.map((section) => ({
+      ...section,
+      enabled: config[section.id as keyof typeof config] ?? section.enabled,
+    }));
+  }, [config]);
 
   const handleLogout = async () => {
     await signOut();

@@ -66,6 +66,43 @@ export const PARAMETER_NAMES: Record<string, string> = {
 };
 
 /**
+ * Mapeo de códigos de parámetros a unidades de medida
+ */
+export const UNITS: Record<string, string> = {
+  'TA_AVG_1.5m': '°C',
+  'TA_AVG_2m': '°C',
+  'TA_AVG_0.1m': '°C',
+  'TO_AVG_1.5m': '°C',
+  'TS_AVG_-0.1m': '°C',
+  'HR_AVG_1.5m': '%',
+  'HR_AVG_2m': '%',
+  'PP_SUM_1.5m': 'mm',
+  'PP_SUM_2m': 'mm',
+  'VV_AVG_10m': 'km/h',
+  'VV_AVG_2m': 'km/h',
+  'VV_RACHA_10m': 'km/h',
+  'VV_RACHA_2m': 'km/h',
+  'DV_AVG_10m': '°',
+  'DV_AVG_2m': '°',
+  'PR_AVG_1.5m': 'hPa',
+  'PA_AVG_1.5m': 'hPa',
+  'PA_AVG_2m': 'hPa',
+  'PRED_AVG_1.5m': 'hPa',
+  'RS_AVG_1.5m': 'W/m²',
+  'RS_AVG_2m': 'W/m²',
+  'HSOL_SUM_1.5m': 'h',
+  'BIO_AVG_1.5m': 'W/m²',
+  'BCN_AVG_1.5m': 'mag/arcsec²',
+  'VV_SD_10m': 'km/h',
+  'VV_SD_2m': 'km/h',
+  'DV_SD_10m': '°',
+  'DV_SD_2m': '°',
+  'DV_CONDICION_10m': '°',
+  'DV_CONDICION_2m': '°',
+  'HF_SUM_2m': 'min',
+};
+
+/**
  * Parámetros principales para mostrar en gráficos
  */
 export const MAIN_PARAMETERS = [
