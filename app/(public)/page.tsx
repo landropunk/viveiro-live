@@ -325,18 +325,18 @@ export default function Home() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
-                className="grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                className="flex w-full flex-col gap-6"
               >
                 {blogPosts.map((post) => (
                   <Link key={post.id} href={`/blog/${post.slug}`}>
                     <motion.article
                       variants={itemVariants}
-                      whileHover={{ scale: 1.03, y: -5 }}
+                      whileHover={{ scale: 1.01, y: -2 }}
                       transition={{ duration: 0.3 }}
-                      className="group cursor-pointer overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:border-blue-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950"
+                      className="group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:border-blue-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950 md:flex-row"
                     >
                       {post.cover_image_url && (
-                        <div className="aspect-video w-full overflow-hidden bg-gray-100 dark:bg-gray-900">
+                        <div className="h-48 w-full overflow-hidden bg-gray-100 dark:bg-gray-900 md:h-auto md:w-80">
                           <img
                             src={post.cover_image_url}
                             alt={post.title}
@@ -344,22 +344,24 @@ export default function Home() {
                           />
                         </div>
                       )}
-                      <div className="p-6">
-                        <div className="mb-3 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                          <span className="rounded-full bg-blue-100 px-2 py-1 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                            {post.category}
-                          </span>
-                          <span>•</span>
-                          <span>{formatDate(post.published_at)}</span>
+                      <div className="flex flex-1 flex-col justify-between p-6">
+                        <div>
+                          <div className="mb-3 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                            <span className="rounded-full bg-blue-100 px-2 py-1 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                              {post.category}
+                            </span>
+                            <span>•</span>
+                            <span>{formatDate(post.published_at)}</span>
+                          </div>
+                          <h3 className="mb-2 text-2xl font-semibold text-gray-900 dark:text-white">
+                            {post.title}
+                          </h3>
+                          {post.excerpt && (
+                            <p className="mb-4 text-gray-600 dark:text-gray-400">
+                              {post.excerpt}
+                            </p>
+                          )}
                         </div>
-                        <h3 className="mb-2 line-clamp-2 text-lg font-semibold text-gray-900 dark:text-white">
-                          {post.title}
-                        </h3>
-                        {post.excerpt && (
-                          <p className="mb-4 line-clamp-3 text-sm text-gray-600 dark:text-gray-400">
-                            {post.excerpt}
-                          </p>
-                        )}
                         <div className="flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400">
                           Leer más
                           <span className="transition-transform group-hover:translate-x-1">
