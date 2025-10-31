@@ -69,6 +69,20 @@ const baseSections: SectionLink[] = [
     path: '/dashboard/webcams',
     enabled: true,
   },
+  {
+    id: 'seccion4',
+    name: 'Sección 4',
+    icon: '🔧',
+    path: '/dashboard/seccion4',
+    enabled: false,
+  },
+  {
+    id: 'seccion5',
+    name: 'Sección 5',
+    icon: '📋',
+    path: '/dashboard/seccion5',
+    enabled: false,
+  },
 ];
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {

@@ -49,6 +49,22 @@ const baseSections: SectionType[] = [
     path: '/dashboard/webcams',
     enabled: true,
   },
+  {
+    id: 'seccion4',
+    name: 'Sección 4',
+    description: 'Sección adicional personalizable - Próximamente disponible',
+    icon: '🔧',
+    path: '/dashboard/seccion4',
+    enabled: false,
+  },
+  {
+    id: 'seccion5',
+    name: 'Sección 5',
+    description: 'Sección adicional personalizable - Próximamente disponible',
+    icon: '📋',
+    path: '/dashboard/seccion5',
+    enabled: false,
+  },
 ];
 
 export default function DashboardPage() {
