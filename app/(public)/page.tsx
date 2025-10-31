@@ -309,26 +309,6 @@ export default function Home() {
               </Link>
               )}
 
-              {/* Más secciones */}
-              <motion.div
-                variants={itemVariants}
-                whileHover={{ scale: 1.05, y: -5 }}
-                transition={{ duration: 0.3 }}
-                className="group rounded-xl border border-gray-200 bg-white p-6 shadow-sm opacity-50 transition-all dark:border-gray-800 dark:bg-gray-950"
-              >
-                <motion.div
-                  className="mb-4 text-5xl"
-                  transition={{ duration: 0.5 }}
-                >
-                  🔧
-                </motion.div>
-                <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-                  Y más servicios
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Próximamente más secciones y servicios para los ciudadanos de Viveiro.
-                </p>
-              </motion.div>
             </motion.div>
           </AnimatedSection>
 
