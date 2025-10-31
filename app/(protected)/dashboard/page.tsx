@@ -50,19 +50,19 @@ const baseSections: SectionType[] = [
     enabled: true,
   },
   {
-    id: 'seccion4',
-    name: 'Sección 4',
-    description: 'Sección adicional personalizable - Próximamente disponible',
-    icon: '🔧',
-    path: '/dashboard/seccion4',
-    enabled: false,
-  },
-  {
     id: 'seccion5',
     name: 'Sección 5',
     description: 'Sección adicional personalizable - Próximamente disponible',
-    icon: '📋',
+    icon: '🔧',
     path: '/dashboard/seccion5',
+    enabled: false,
+  },
+  {
+    id: 'seccion6',
+    name: 'Sección 6',
+    description: 'Sección adicional personalizable - Próximamente disponible',
+    icon: '📋',
+    path: '/dashboard/seccion6',
     enabled: false,
   },
 ];

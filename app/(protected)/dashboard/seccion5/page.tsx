@@ -10,7 +10,7 @@ export default function Seccion5Page() {
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="mb-4 text-6xl">📋</div>
+          <div className="mb-4 text-6xl">🔧</div>
           <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">
             Sección 5
           </h1>
@@ -36,10 +36,10 @@ export default function Seccion5Page() {
                 💡 Ideas de uso:
               </h3>
               <ul className="list-inside list-disc space-y-2 text-gray-600 dark:text-gray-400">
-                <li>Trámites y gestiones municipales</li>
-                <li>Información turística y rutas</li>
-                <li>Directorio de comercios locales</li>
-                <li>Sistema de avisos y alertas</li>
+                <li>Sistema de notificaciones municipales</li>
+                <li>Calendario de eventos y actividades</li>
+                <li>Directorio de servicios locales</li>
+                <li>Foro o sistema de consultas ciudadanas</li>
                 <li>Cualquier funcionalidad que necesite tu municipio</li>
               </ul>
             </div>

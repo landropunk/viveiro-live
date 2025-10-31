@@ -70,17 +70,17 @@ const baseSections: SectionLink[] = [
     enabled: true,
   },
   {
-    id: 'seccion4',
-    name: 'Sección 4',
+    id: 'seccion5',
+    name: 'Sección 5',
     icon: '🔧',
-    path: '/dashboard/seccion4',
+    path: '/dashboard/seccion5',
     enabled: false,
   },
   {
-    id: 'seccion5',
-    name: 'Sección 5',
+    id: 'seccion6',
+    name: 'Sección 6',
     icon: '📋',
-    path: '/dashboard/seccion5',
+    path: '/dashboard/seccion6',
     enabled: false,
   },
 ];

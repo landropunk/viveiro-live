@@ -5,8 +5,8 @@ interface DashboardConfig {
   historicos: boolean;
   live: boolean;
   webcams: boolean;
-  seccion4: boolean;
   seccion5: boolean;
+  seccion6: boolean;
 }
 
 /**
@@ -19,8 +19,8 @@ export function useDashboardConfig() {
     historicos: false,
     live: true,
     webcams: true,
-    seccion4: false,
     seccion5: false,
+    seccion6: false,
   });
   const [loading, setLoading] = useState(true);
 

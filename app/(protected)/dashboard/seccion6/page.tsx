@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
-export default function Seccion4Page() {
+export default function Seccion6Page() {
   const router = useRouter();
 
   return (
@@ -10,9 +10,9 @@ export default function Seccion4Page() {
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="mb-4 text-6xl">🔧</div>
+          <div className="mb-4 text-6xl">📋</div>
           <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">
-            Sección 4
+            Sección 6
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
             Esta sección está preparada para ser personalizada según tus necesidades
@@ -27,7 +27,7 @@ export default function Seccion4Page() {
                 🎨 Personaliza esta sección
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Puedes modificar el archivo <code className="rounded bg-gray-100 px-2 py-1 text-sm dark:bg-gray-800">app/(protected)/dashboard/seccion4/page.tsx</code> para agregar el contenido que necesites.
+                Puedes modificar el archivo <code className="rounded bg-gray-100 px-2 py-1 text-sm dark:bg-gray-800">app/(protected)/dashboard/seccion6/page.tsx</code> para agregar el contenido que necesites.
               </p>
             </div>
 
@@ -36,11 +36,11 @@ export default function Seccion4Page() {
                 💡 Ideas de uso:
               </h3>
               <ul className="list-inside list-disc space-y-2 text-gray-600 dark:text-gray-400">
-                <li>Sistema de notificaciones municipales</li>
-                <li>Calendario de eventos y actividades</li>
-                <li>Directorio de servicios locales</li>
-                <li>Foro o sistema de consultas ciudadanas</li>
-                <li>Cualquier funcionalidad que necesite tu municipio</li>
+                <li>Galería de fotos y vídeos de Viveiro</li>
+                <li>Registro de actividades turísticas</li>
+                <li>Sistema de encuestas ciudadanas</li>
+                <li>Marketplace de productos locales</li>
+                <li>Cualquier otra funcionalidad personalizada</li>
               </ul>
             </div>
 
@@ -50,7 +50,7 @@ export default function Seccion4Page() {
                 <span>Activación</span>
               </h3>
               <p className="text-sm text-blue-800 dark:text-blue-300">
-                Para activar esta sección, ve a <strong>/admin/settings</strong> y desbloquea "Sección 4" modificando su estado <code>locked</code> en la base de datos.
+                Para activar esta sección, ve a <strong>/admin/settings</strong> y desbloquea "Sección 6" modificando su estado <code>locked</code> en la base de datos.
               </p>
             </div>
 
