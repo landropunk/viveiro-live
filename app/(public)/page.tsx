@@ -311,9 +311,11 @@ export default function Home() {
 
             </motion.div>
           </AnimatedSection>
+        </div>
 
-          {/* Blog / Noticias */}
-          {blogEnabled && !loadingPosts && blogPosts.length > 0 && (
+        {/* Blog / Noticias - Full Width */}
+        {blogEnabled && !loadingPosts && blogPosts.length > 0 && (
+          <div className="w-full px-4 sm:px-6 lg:px-8">
             <AnimatedSection className="mt-20">
               <div className="mb-12 text-center">
                 <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
@@ -325,7 +327,7 @@ export default function Home() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
-                className="grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                className="mx-auto grid max-w-7xl gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
               >
                 {blogPosts.map((post) => (
                   <Link key={post.id} href={`/blog/${post.slug}`}>
@@ -372,8 +374,11 @@ export default function Home() {
                 ))}
               </motion.div>
             </AnimatedSection>
-          )}
+          </div>
+        )}
 
+        {/* Reabrir contenedor principal */}
+        <div className="z-10 w-full max-w-6xl">
           {/* CTA Footer */}
           <AnimatedSection className="mt-20" direction="up">
             <motion.div
