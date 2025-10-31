@@ -9,6 +9,7 @@ import AnimatedSection from "@/components/AnimatedSection";
 import { useAuth } from "@/contexts/AuthContext";
 import { getPublishedBlogPosts, type BlogPost } from "@/lib/admin/blog";
 import { createClient } from "@/lib/supabase/client";
+import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -31,6 +32,7 @@ const itemVariants = {
 
 export default function Home() {
   const { user } = useAuth();
+  const { config: sectionsConfig } = useDashboardConfig();
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [blogEnabled, setBlogEnabled] = useState(true);
@@ -188,6 +190,7 @@ export default function Home() {
               className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
             >
               {/* Meteorología */}
+              {sectionsConfig.meteo && (
               <Link href={user ? "/dashboard/meteo" : "/auth/login"}>
                 <motion.div
                   variants={itemVariants}
@@ -214,8 +217,10 @@ export default function Home() {
                   </p>
                 </motion.div>
               </Link>
+              )}
 
               {/* Live/Play */}
+              {sectionsConfig.live && (
               <Link href={user ? "/dashboard/eventos" : "/auth/login"}>
                 <motion.div
                   variants={itemVariants}
@@ -242,8 +247,10 @@ export default function Home() {
                   </p>
                 </motion.div>
               </Link>
+              )}
 
               {/* Webcams */}
+              {sectionsConfig.webcams && (
               <Link href={user ? "/dashboard/webcams" : "/auth/login"}>
                 <motion.div
                   variants={itemVariants}
@@ -270,6 +277,37 @@ export default function Home() {
                   </p>
                 </motion.div>
               </Link>
+              )}
+
+              {/* Históricos Horarios */}
+              {sectionsConfig.historicos && (
+              <Link href={user ? "/dashboard/historicos" : "/auth/login"}>
+                <motion.div
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  transition={{ duration: 0.3 }}
+                  className="group cursor-pointer rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-orange-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950"
+                >
+                  <motion.div
+                    className="mb-4 text-5xl"
+                    whileHover={{ scale: 1.2, rotate: [0, -10, 10, -10, 0] }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    📊
+                  </motion.div>
+                  <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
+                    Históricos Horarios
+                    <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
+                      →
+                    </span>
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Consulta datos históricos de las últimas horas con gráficos interactivos
+                    de temperatura, humedad, viento y precipitación.
+                  </p>
+                </motion.div>
+              </Link>
+              )}
 
               {/* Más secciones */}
               <motion.div

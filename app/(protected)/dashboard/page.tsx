@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDashboardConfig } from '@/hooks/useDashboardConfig';
 import Link from 'next/link';
 
 type SectionType = {
@@ -14,7 +15,8 @@ type SectionType = {
   enabled: boolean;
 };
 
-const sections: SectionType[] = [
+// Definición base de secciones (se sobrescribe con configuración dinámica)
+const baseSections: SectionType[] = [
   {
     id: 'meteo',
     name: 'Meteorología',
@@ -24,7 +26,15 @@ const sections: SectionType[] = [
     enabled: true,
   },
   {
-    id: 'eventos',
+    id: 'historicos',
+    name: 'Históricos Horarios',
+    description: 'Consulta datos históricos de las últimas horas con gráficos interactivos',
+    icon: '📊',
+    path: '/dashboard/historicos',
+    enabled: false,
+  },
+  {
+    id: 'live',
     name: 'Live / Play',
     description: 'Eventos en directo, retransmisiones y contenido multimedia',
     icon: '🔴',
@@ -39,27 +49,20 @@ const sections: SectionType[] = [
     path: '/dashboard/webcams',
     enabled: true,
   },
-  {
-    id: 'seccion4',
-    name: 'Sección 4',
-    description: 'Próximamente disponible',
-    icon: '🔧',
-    path: '/dashboard/seccion4',
-    enabled: false,
-  },
-  {
-    id: 'seccion5',
-    name: 'Sección 5',
-    description: 'Próximamente disponible',
-    icon: '📊',
-    path: '/dashboard/seccion5',
-    enabled: false,
-  },
 ];
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { config, loading: configLoading } = useDashboardConfig();
+
+  // Aplicar configuración dinámica a las secciones
+  const sections = useMemo(() => {
+    return baseSections.map((section) => ({
+      ...section,
+      enabled: config[section.id as keyof typeof config] ?? section.enabled,
+    }));
+  }, [config]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -70,7 +73,7 @@ export default function DashboardPage() {
     }
   }, [user, authLoading, router]);
 
-  if (authLoading) {
+  if (authLoading || configLoading) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center px-4">
         <div className="text-center">
@@ -103,68 +106,42 @@ export default function DashboardPage() {
 
         {/* Sections Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {sections.map((section) => (
-            <div key={section.id}>
-              {section.enabled ? (
-                <Link href={section.path}>
-                  <div className="group relative h-full overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-blue-500 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:hover:border-blue-400">
-                    {/* Icon */}
-                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-4xl transition-colors group-hover:bg-blue-100 dark:bg-blue-900/30 dark:group-hover:bg-blue-900/50">
-                      {section.icon}
-                    </div>
-
-                    {/* Title */}
-                    <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-                      {section.name}
-                    </h2>
-
-                    {/* Description */}
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {section.description}
-                    </p>
-
-                    {/* Arrow indicator */}
-                    <div className="absolute bottom-6 right-6 text-blue-500 opacity-0 transition-opacity group-hover:opacity-100 dark:text-blue-400">
-                      <svg
-                        className="h-6 w-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13 7l5 5m0 0l-5 5m5-5H6"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </Link>
-              ) : (
-                <div className="h-full cursor-not-allowed rounded-lg border border-gray-200 bg-gray-50 p-6 opacity-60 dark:border-gray-700 dark:bg-gray-800/50">
-                  {/* Icon */}
-                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-4xl dark:bg-gray-700">
-                    {section.icon}
-                  </div>
-
-                  {/* Title */}
-                  <h2 className="mb-2 text-xl font-semibold text-gray-500 dark:text-gray-400">
-                    {section.name}
-                  </h2>
-
-                  {/* Description */}
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
-                    {section.description}
-                  </p>
-
-                  {/* Coming soon badge */}
-                  <div className="mt-4 inline-block rounded-full bg-gray-200 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-                    Próximamente
-                  </div>
+          {sections.filter(s => s.enabled).map((section) => (
+            <Link key={section.id} href={section.path}>
+              <div className="group relative h-full overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-blue-500 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:hover:border-blue-400">
+                {/* Icon */}
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-4xl transition-colors group-hover:bg-blue-100 dark:bg-blue-900/30 dark:group-hover:bg-blue-900/50">
+                  {section.icon}
                 </div>
-              )}
-            </div>
+
+                {/* Title */}
+                <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
+                  {section.name}
+                </h2>
+
+                {/* Description */}
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {section.description}
+                </p>
+
+                {/* Arrow indicator */}
+                <div className="absolute bottom-6 right-6 text-blue-500 opacity-0 transition-opacity group-hover:opacity-100 dark:text-blue-400">
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </Link>
           ))}
         </div>
 
