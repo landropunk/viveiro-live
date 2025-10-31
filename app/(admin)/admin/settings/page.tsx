@@ -95,6 +95,16 @@ export default function SettingsPage() {
     updateSetting(setting.key, { value: newValue });
   };
 
+  // Orden deseado de las secciones
+  const sectionOrder = [
+    'section_meteo',
+    'section_historicos',
+    'section_live',
+    'section_webcams',
+    'section_seccion5',
+    'section_seccion6',
+  ];
+
   const groupedSettings = settings.reduce((acc, setting) => {
     if (!acc[setting.category]) {
       acc[setting.category] = [];
@@ -102,6 +112,18 @@ export default function SettingsPage() {
     acc[setting.category].push(setting);
     return acc;
   }, {} as Record<string, AppSetting[]>);
+
+  // Ordenar las secciones según el orden definido
+  if (groupedSettings.sections) {
+    groupedSettings.sections.sort((a, b) => {
+      const indexA = sectionOrder.indexOf(a.key);
+      const indexB = sectionOrder.indexOf(b.key);
+      // Si no está en el array, ponerlo al final
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+  }
 
   const categoryLabels = {
     sections: 'Secciones del Dashboard',
