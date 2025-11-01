@@ -241,12 +241,19 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           {sections.map((section) => {
             const isActive = pathname?.startsWith(section.path);
 
+            // Si está deshabilitada
             if (!section.enabled) {
+              // Usuarios normales no ven secciones deshabilitadas
+              if (!isAdmin) {
+                return null;
+              }
+
+              // Administradores ven secciones deshabilitadas con candado
               return (
                 <div
                   key={section.id}
                   className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-400 opacity-50 dark:text-gray-600"
-                  title="Próximamente disponible"
+                  title="Deshabilitado - Solo visible para administradores"
                 >
                   <span className={typeof section.icon === 'string' ? 'mr-3 text-xl' : 'mr-3'}>
                     {section.icon}
@@ -257,6 +264,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               );
             }
 
+            // Sección habilitada (todos los usuarios la ven)
             return (
               <Link
                 key={section.id}

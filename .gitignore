@@ -44,8 +44,12 @@ next-env.d.ts
 # Claude Code settings (local configuration)
 .claude/settings.local.json
 
-# Scripts auxiliares de GitHub (locales, no subir)
-crear-repo-github.html
-crear-y-push.ps1
-push-to-github.bat
-PUSH_TO_GITHUB.md
+# Archivos temporales y de desarrollo
+*.html
+*.bat
+*.ps1
+nul
+
+# Archivos de configuración local
+.env.local.*
+.env.production.template

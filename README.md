@@ -399,8 +399,12 @@ Este proyecto es privado y pertenece a la comunidad de Viveiro.
 
 ## 📚 Documentación Adicional
 
-- **[ADMIN_SETUP.md](./ADMIN_SETUP.md)** - Guía completa de configuración del panel admin
-- **[METEOGALICIA_API_UPDATE_2024.md](./METEOGALICIA_API_UPDATE_2024.md)** - Actualización API MeteoGalicia
+Ver **[docs/README.md](./docs/README.md)** para el índice completo de documentación organizada:
+
+- **Setup y Configuración** - Guías de instalación, Supabase, OAuth
+- **Guías de Usuario** - Sistema de blog, gestión de usuarios, migraciones
+- **APIs y Servicios** - MeteoGalicia API, estaciones, webcams
+- **Troubleshooting** - Solución de problemas comunes
 - **[CLAUDE.md](./CLAUDE.md)** - Instrucciones para desarrollo con Claude Code
 
 ---

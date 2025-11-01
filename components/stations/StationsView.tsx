@@ -7,6 +7,7 @@ import { VIVEIRO_STATIONS } from '@/lib/meteogalicia-stations';
 import StationSelector from './StationSelector';
 import StationDataCard from './StationDataCard';
 import StationComparisonChart from './StationComparisonChart';
+import HistoricalDataSection from './HistoricalDataSection';
 
 // Importación del mapa con Google Maps
 const StationsMap = dynamic(() => import('./StationsMap'), {
@@ -318,6 +319,14 @@ export default function StationsView() {
           </p>
         </div>
       )}
+
+      {/* Sección de Datos Históricos */}
+      <div>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          Consulta de Históricos Extendidos
+        </h3>
+        <HistoricalDataSection />
+      </div>
     </div>
   );
 }

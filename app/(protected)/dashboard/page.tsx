@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useDashboardConfig } from '@/hooks/useDashboardConfig';
 import Link from 'next/link';
 
@@ -70,6 +71,7 @@ const baseSections: SectionType[] = [
 export default function DashboardPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const isAdmin = useIsAdmin();
   const { config, loading: configLoading } = useDashboardConfig();
 
   // Aplicar configuración dinámica a las secciones
@@ -79,6 +81,17 @@ export default function DashboardPage() {
       enabled: config[section.id as keyof typeof config] ?? section.enabled,
     }));
   }, [config]);
+
+  // Filtrar secciones según el rol del usuario
+  const visibleSections = useMemo(() => {
+    if (isAdmin) {
+      // Administradores ven todas las secciones
+      return sections;
+    } else {
+      // Usuarios normales solo ven secciones habilitadas
+      return sections.filter(s => s.enabled);
+    }
+  }, [sections, isAdmin]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -122,43 +135,95 @@ export default function DashboardPage() {
 
         {/* Sections Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {sections.filter(s => s.enabled).map((section) => (
-            <Link key={section.id} href={section.path}>
-              <div className="group relative h-full overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-blue-500 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:hover:border-blue-400">
-                {/* Icon */}
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-4xl transition-colors group-hover:bg-blue-100 dark:bg-blue-900/30 dark:group-hover:bg-blue-900/50">
-                  {section.icon}
+          {visibleSections.map((section) => {
+            const isDisabled = !section.enabled;
+
+            // Si está deshabilitada y el usuario es admin, mostrar con candado
+            if (isDisabled && isAdmin) {
+              return (
+                <div
+                  key={section.id}
+                  className="relative h-full overflow-hidden rounded-lg border border-gray-300 bg-gray-100 p-6 opacity-50 dark:border-gray-600 dark:bg-gray-700/50"
+                >
+                  {/* Candado en esquina superior derecha */}
+                  <div className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 dark:bg-gray-600">
+                    <svg
+                      className="h-4 w-4 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </div>
+
+                  {/* Icon */}
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-4xl dark:bg-gray-600">
+                    {section.icon}
+                  </div>
+
+                  {/* Title */}
+                  <h2 className="mb-2 text-xl font-semibold text-gray-700 dark:text-gray-400">
+                    {section.name}
+                  </h2>
+
+                  {/* Description */}
+                  <p className="text-sm text-gray-500 dark:text-gray-500">
+                    {section.description}
+                  </p>
+
+                  {/* Badge de deshabilitado */}
+                  <div className="mt-4 inline-block rounded-full bg-gray-300 px-3 py-1 text-xs font-semibold text-gray-700 dark:bg-gray-600 dark:text-gray-300">
+                    Deshabilitado
+                  </div>
                 </div>
+              );
+            }
 
-                {/* Title */}
-                <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-                  {section.name}
-                </h2>
+            // Sección habilitada (normal)
+            return (
+              <Link key={section.id} href={section.path}>
+                <div className="group relative h-full overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-blue-500 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:hover:border-blue-400">
+                  {/* Icon */}
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-4xl transition-colors group-hover:bg-blue-100 dark:bg-blue-900/30 dark:group-hover:bg-blue-900/50">
+                    {section.icon}
+                  </div>
 
-                {/* Description */}
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {section.description}
-                </p>
+                  {/* Title */}
+                  <h2 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
+                    {section.name}
+                  </h2>
 
-                {/* Arrow indicator */}
-                <div className="absolute bottom-6 right-6 text-blue-500 opacity-0 transition-opacity group-hover:opacity-100 dark:text-blue-400">
-                  <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
+                  {/* Description */}
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {section.description}
+                  </p>
+
+                  {/* Arrow indicator */}
+                  <div className="absolute bottom-6 right-6 text-blue-500 opacity-0 transition-opacity group-hover:opacity-100 dark:text-blue-400">
+                    <svg
+                      className="h-6 w-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
+                    </svg>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Footer info */}
@@ -171,7 +236,11 @@ export default function DashboardPage() {
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Este portal municipal ofrece acceso a diferentes servicios y secciones para los ciudadanos de Viveiro.
-                Todas las secciones están disponibles con tu cuenta registrada.
+                {isAdmin && (
+                  <span className="ml-1 font-semibold text-blue-600 dark:text-blue-400">
+                    Como administrador, puedes ver todas las secciones (las deshabilitadas aparecen con candado).
+                  </span>
+                )}
               </p>
             </div>
           </div>
