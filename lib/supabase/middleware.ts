@@ -51,6 +51,24 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Verificar si el usuario autenticado tiene perfil completo
+  if (user && !request.nextUrl.pathname.startsWith('/complete-profile') && !request.nextUrl.pathname.startsWith('/api/')) {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('full_name, city')
+      .eq('id', user.id)
+      .single()
+
+    // Si el perfil no existe o está incompleto, redirigir a complete-profile
+    const isProfileIncomplete = !profile || !profile.full_name || !profile.city
+
+    if (isProfileIncomplete && (request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/admin'))) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/complete-profile'
+      return NextResponse.redirect(url)
+    }
+  }
+
   // Proteger rutas de administración
   if (request.nextUrl.pathname.startsWith('/admin')) {
     if (!user) {
@@ -59,9 +77,16 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    // Verificar que el usuario es admin
-    const isAdmin = user.user_metadata?.role === 'admin'
+    // Verificar que el usuario es admin consultando la tabla user_profiles
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    const isAdmin = profile?.role === 'admin'
     if (!isAdmin) {
+      console.log(`⛔ Usuario ${user.email} intentó acceder a ${request.nextUrl.pathname} sin permisos de admin`)
       const url = request.nextUrl.clone()
       url.pathname = '/dashboard'
       return NextResponse.redirect(url)

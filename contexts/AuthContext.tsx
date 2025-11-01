@@ -81,10 +81,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signInWithGoogle = async (forceAccountSelection = false) => {
+    // Usar NEXT_PUBLIC_SITE_URL si está configurado, sino usar window.location.origin
+    const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${redirectUrl}/auth/callback`,
         queryParams: forceAccountSelection ? {
           prompt: 'select_account',
         } : undefined,
@@ -93,10 +96,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signInWithFacebook = async (forceAccountSelection = false) => {
+    const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+
     await supabase.auth.signInWithOAuth({
       provider: 'facebook',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${redirectUrl}/auth/callback`,
         queryParams: forceAccountSelection ? {
           auth_type: 'reauthenticate',
         } : undefined,
@@ -105,10 +110,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signInWithMicrosoft = async (forceAccountSelection = false) => {
+    const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+
     await supabase.auth.signInWithOAuth({
       provider: 'azure',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${redirectUrl}/auth/callback`,
         scopes: 'email',
         queryParams: forceAccountSelection ? {
           prompt: 'select_account',
