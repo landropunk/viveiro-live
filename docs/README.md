@@ -11,7 +11,9 @@
 
 ### Base de Datos y Backend
 - [DATABASE_SETUP.md](setup/DATABASE_SETUP.md) - Configuración de base de datos
-- [SUPABASE_SETUP.md](setup/SUPABASE_SETUP.md) - Configuración de Supabase
+- [SUPABASE_SETUP.md](setup/SUPABASE_SETUP.md) - Configuración de Supabase (antigua)
+- ⭐ [SUPABASE_INTEGRATION_GUIDE.md](setup/SUPABASE_INTEGRATION_GUIDE.md) - **Guía completa de integración con Supabase Cloud**
+- ⭐ [SUPABASE_SELFHOSTED.md](setup/SUPABASE_SELFHOSTED.md) - **Instalación de Supabase en servidor privado**
 - [ADMIN_SETUP.md](setup/ADMIN_SETUP.md) - Configuración del panel de administración
 
 ### OAuth y Autenticación

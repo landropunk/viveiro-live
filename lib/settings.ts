@@ -4,10 +4,13 @@
  * y agrega funciones helper específicas para permisos de usuarios
  */
 
-import { getSetting, getSettings, getSettingsByCategory, updateSetting } from '@/lib/admin/settings'
+import { getSetting, getAllSettings, getSettingsByCategory, updateSetting } from '@/lib/admin/settings'
 
 // Reexportar funciones principales
-export { getSetting, getSettings, getSettingsByCategory, updateSetting }
+export { getSetting, getAllSettings, getSettingsByCategory, updateSetting }
+
+// Alias para compatibilidad
+export { getAllSettings as getSettings }
 
 /**
  * Verifica si los usuarios pueden editar su perfil

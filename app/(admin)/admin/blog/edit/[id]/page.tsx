@@ -69,7 +69,17 @@ export default function EditBlogPostPage() {
 
       <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-950">
         <BlogPostForm
-          initialData={post}
+          initialData={{
+            title: post.title,
+            slug: post.slug,
+            excerpt: post.excerpt ?? undefined,
+            content: post.content,
+            cover_image_url: post.cover_image_url ?? undefined,
+            category: post.category,
+            tags: post.tags,
+            is_published: post.is_published,
+            published_at: post.published_at ?? undefined
+          }}
           onSubmit={handleSubmit}
           submitLabel="Guardar Cambios"
         />

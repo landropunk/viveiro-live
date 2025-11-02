@@ -49,7 +49,7 @@ export default function LoginPage() {
             <div className="mb-6 space-y-3">
               {/* Google OAuth */}
               <button
-                onClick={signInWithGoogle}
+                onClick={() => signInWithGoogle()}
                 className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 font-medium text-gray-700 transition-all hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -75,7 +75,7 @@ export default function LoginPage() {
 
               {/* Facebook OAuth */}
               <button
-                onClick={signInWithFacebook}
+                onClick={() => signInWithFacebook()}
                 className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 font-medium text-gray-700 transition-all hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
               >
                 <svg className="h-5 w-5" fill="#1877F2" viewBox="0 0 24 24">
@@ -86,7 +86,7 @@ export default function LoginPage() {
 
               {/* Microsoft OAuth */}
               <button
-                onClick={signInWithMicrosoft}
+                onClick={() => signInWithMicrosoft()}
                 className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 font-medium text-gray-700 transition-all hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
               >
                 <svg className="h-5 w-5" viewBox="0 0 23 23">

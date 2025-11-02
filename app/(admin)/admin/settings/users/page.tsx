@@ -149,7 +149,7 @@ export default function UserSettingsPage() {
                 <div className="ml-4">
                   {typeof setting.value === 'boolean' && (
                     <button
-                      onClick={() => handleToggle(setting.key, setting.value)}
+                      onClick={() => handleToggle(setting.key, setting.value as boolean)}
                       disabled={saving === setting.key}
                       className={`
                         relative inline-flex h-6 w-11 items-center rounded-full transition-colors
