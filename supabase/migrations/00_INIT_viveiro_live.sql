@@ -303,6 +303,100 @@ COMMENT ON COLUMN public.webcams.type IS 'Tipo de webcam: image (actualización 
 COMMENT ON COLUMN public.webcams.refresh_interval IS 'Intervalo de actualización en segundos (solo para tipo image)';
 
 -- ============================================================================
+-- 4. SISTEMA DE BLOG
+-- ============================================================================
+
+-- Tabla de posts del blog
+CREATE TABLE IF NOT EXISTS public.blog_posts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  excerpt TEXT,
+  content TEXT NOT NULL,
+  cover_image_url TEXT,
+  category TEXT,
+  tags TEXT[] DEFAULT '{}',
+  is_published BOOLEAN DEFAULT false,
+  published_at TIMESTAMP WITH TIME ZONE,
+  view_count INTEGER DEFAULT 0,
+  author_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Índices
+CREATE INDEX IF NOT EXISTS blog_posts_slug_idx ON public.blog_posts(slug);
+CREATE INDEX IF NOT EXISTS blog_posts_author_idx ON public.blog_posts(author_id);
+CREATE INDEX IF NOT EXISTS blog_posts_published_idx ON public.blog_posts(is_published, published_at);
+CREATE INDEX IF NOT EXISTS blog_posts_category_idx ON public.blog_posts(category);
+
+-- Trigger para updated_at
+DROP TRIGGER IF EXISTS update_blog_posts_updated_at ON public.blog_posts;
+CREATE TRIGGER update_blog_posts_updated_at
+  BEFORE UPDATE ON public.blog_posts
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- Habilitar RLS
+ALTER TABLE public.blog_posts ENABLE ROW LEVEL SECURITY;
+
+-- Eliminar políticas existentes
+DROP POLICY IF EXISTS "Posts publicados son visibles para todos" ON public.blog_posts;
+DROP POLICY IF EXISTS "Solo admins pueden insertar posts" ON public.blog_posts;
+DROP POLICY IF EXISTS "Solo admins pueden actualizar posts" ON public.blog_posts;
+DROP POLICY IF EXISTS "Solo admins pueden eliminar posts" ON public.blog_posts;
+
+-- Políticas RLS
+CREATE POLICY "Posts publicados son visibles para todos"
+  ON public.blog_posts
+  FOR SELECT
+  USING (is_published = true);
+
+CREATE POLICY "Solo admins pueden insertar posts"
+  ON public.blog_posts
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
+CREATE POLICY "Solo admins pueden actualizar posts"
+  ON public.blog_posts
+  FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
+CREATE POLICY "Solo admins pueden eliminar posts"
+  ON public.blog_posts
+  FOR DELETE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
+-- Comentarios
+COMMENT ON TABLE public.blog_posts IS 'Posts del blog/noticias de Viveiro Live';
+COMMENT ON COLUMN public.blog_posts.slug IS 'URL amigable generada automáticamente desde el título';
+COMMENT ON COLUMN public.blog_posts.tags IS 'Array de etiquetas para categorización';
+
+-- ============================================================================
 -- FIN DE LA MIGRACIÓN INICIAL
 -- ============================================================================
 
@@ -320,4 +414,9 @@ UNION ALL
 SELECT
   'webcams' as tabla,
   COUNT(*) as registros
-FROM public.webcams;
+FROM public.webcams
+UNION ALL
+SELECT
+  'blog_posts' as tabla,
+  COUNT(*) as registros
+FROM public.blog_posts;

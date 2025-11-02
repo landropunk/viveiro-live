@@ -50,12 +50,22 @@ export async function getViveiroWeatherForecast(): Promise<WeatherForecast> {
         'Accept': 'application/json',
       },
       cache: 'no-store', // Sin caché - datos frescos en cada request
+      // Timeout de 15 segundos
+      signal: AbortSignal.timeout(15000),
     });
 
     console.log('📥 Respuesta API V5:', response.status, response.statusText);
 
     if (!response.ok) {
-      throw new Error(`Error API MeteoGalicia: ${response.status} ${response.statusText}`);
+      console.warn(`⚠️ Error API MeteoGalicia: ${response.status} ${response.statusText} - Usando datos fallback`);
+      return getFallbackWeatherData();
+    }
+
+    // Verificar que la respuesta es JSON antes de parsear
+    const contentType = response.headers.get('content-type');
+    if (!contentType?.includes('application/json')) {
+      console.warn(`⚠️ API MeteoGalicia retornó ${contentType} en lugar de JSON - Usando datos fallback`);
+      return getFallbackWeatherData();
     }
 
     const data = await response.json();
@@ -67,9 +77,27 @@ export async function getViveiroWeatherForecast(): Promise<WeatherForecast> {
 
     return transformMeteoGaliciaData(data);
   } catch (error) {
-    console.error('❌ Error obteniendo datos de MeteoGalicia:', error);
-    throw error;
+    if (error instanceof Error && error.name === 'TimeoutError') {
+      console.warn('⚠️ Timeout obteniendo datos de MeteoGalicia - Usando datos fallback');
+    } else if (error instanceof SyntaxError) {
+      console.warn('⚠️ Error parseando JSON de MeteoGalicia (probablemente HTML) - Usando datos fallback');
+    } else {
+      console.error('❌ Error obteniendo datos de MeteoGalicia:', error);
+    }
+    return getFallbackWeatherData();
   }
+}
+
+/**
+ * Retorna datos de respaldo cuando la API de MeteoGalicia no está disponible
+ */
+function getFallbackWeatherData(): WeatherForecast {
+  const now = new Date();
+  return {
+    location: VIVEIRO_LOCATION,
+    data: [],
+    lastUpdate: now.toISOString(),
+  };
 }
 
 /**
@@ -131,13 +159,14 @@ function calculateFeelsLike(temp: number, windSpeedKmh: number, humidity?: numbe
 /**
  * Obtiene datos meteorológicos actuales
  */
-export async function getCurrentWeather(): Promise<CurrentWeatherData> {
+export async function getCurrentWeather(): Promise<CurrentWeatherData | null> {
   try {
     const forecast = await getViveiroWeatherForecast();
     const currentData = forecast.data[0];
 
     if (!currentData) {
-      throw new Error('No hay datos disponibles');
+      console.warn('⚠️ No hay datos de pronóstico disponibles - API de MeteoGalicia no responde');
+      return null;
     }
 
     const feelsLike = calculateFeelsLike(
@@ -159,7 +188,7 @@ export async function getCurrentWeather(): Promise<CurrentWeatherData> {
     };
   } catch (error) {
     console.error('Error obteniendo clima actual:', error);
-    throw error;
+    return null;
   }
 }
 

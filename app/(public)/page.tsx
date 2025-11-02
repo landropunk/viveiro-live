@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import AnimatedSection from "@/components/AnimatedSection";
 import { useAuth } from "@/contexts/AuthContext";
-import { getPublishedBlogPosts, type BlogPost } from "@/lib/admin/blog";
+import type { BlogPost } from "@/lib/admin/blog";
 import { createClient } from "@/lib/supabase/client";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 
@@ -57,8 +57,20 @@ export default function Home() {
 
     const loadBlogPosts = async () => {
       try {
-        const posts = await getPublishedBlogPosts(3); // Últimos 3 posts
-        setBlogPosts(posts);
+        const supabase = createClient();
+        const { data: posts, error } = await supabase
+          .from('blog_posts')
+          .select('*')
+          .eq('is_published', true)
+          .order('published_at', { ascending: false })
+          .limit(3);
+
+        if (error) {
+          console.error('Error loading blog posts:', error);
+          return;
+        }
+
+        setBlogPosts(posts || []);
       } catch (error) {
         console.error('Error loading blog posts:', error);
       } finally {

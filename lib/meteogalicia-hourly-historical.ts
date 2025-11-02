@@ -78,10 +78,20 @@ export async function getHourlyHistoricalData(
         'Accept': 'application/json',
       },
       cache: 'no-store',
+      // Timeout de 10 segundos
+      signal: AbortSignal.timeout(10000),
     });
 
     if (!response.ok) {
-      throw new Error(`Error API históricos: ${response.status} ${response.statusText}`);
+      console.warn(`⚠️ Error API históricos: ${response.status} ${response.statusText} - Retornando datos vacíos`);
+      return [];
+    }
+
+    // Verificar que la respuesta es JSON antes de parsear
+    const contentType = response.headers.get('content-type');
+    if (!contentType?.includes('application/json')) {
+      console.warn(`⚠️ API históricos retornó ${contentType} en lugar de JSON - Retornando datos vacíos`);
+      return [];
     }
 
     const data: HourlyHistoricalResponse = await response.json();
@@ -93,8 +103,15 @@ export async function getHourlyHistoricalData(
 
     return transformHourlyData(data);
   } catch (error) {
-    console.error('❌ Error obteniendo datos horarios históricos:', error);
-    throw error;
+    if (error instanceof Error && error.name === 'TimeoutError') {
+      console.warn('⚠️ Timeout obteniendo datos horarios históricos - Retornando datos vacíos');
+    } else if (error instanceof SyntaxError) {
+      console.warn('⚠️ Error parseando JSON de API históricos (probablemente HTML) - Retornando datos vacíos');
+    } else {
+      console.error('❌ Error obteniendo datos horarios históricos:', error);
+    }
+    // Retornar array vacío en lugar de lanzar error
+    return [];
   }
 }
 

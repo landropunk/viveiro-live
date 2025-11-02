@@ -20,6 +20,15 @@ export async function GET(request: NextRequest) {
 
     const currentWeather = await getCurrentWeather();
 
+    // Si no hay datos disponibles (API caída), retornar respuesta exitosa con null
+    if (!currentWeather) {
+      return NextResponse.json({
+        success: true,
+        data: null,
+        warning: 'Datos de clima no disponibles temporalmente',
+      });
+    }
+
     return NextResponse.json({
       success: true,
       data: currentWeather,

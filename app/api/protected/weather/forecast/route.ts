@@ -15,6 +15,15 @@ export async function GET(request: NextRequest) {
 
     const forecast = await getViveiroWeatherForecast();
 
+    // Si no hay datos, retornar respuesta exitosa con datos vacíos
+    if (!forecast.data || forecast.data.length === 0) {
+      return NextResponse.json({
+        success: true,
+        data: forecast,
+        warning: 'Datos de pronóstico no disponibles temporalmente',
+      });
+    }
+
     return NextResponse.json({
       success: true,
       data: forecast,

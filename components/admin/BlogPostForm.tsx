@@ -77,7 +77,7 @@ export default function BlogPostForm({
   const handleRemoveTag = (tagToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter((tag) => tag !== tagToRemove),
+      tags: prev.tags?.filter((tag) => tag !== tagToRemove) || [],
     }));
   };
 
@@ -253,7 +253,7 @@ export default function BlogPostForm({
             Añadir
           </button>
         </div>
-        {formData.tags.length > 0 && (
+        {formData.tags && formData.tags.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-2">
             {formData.tags.map((tag) => (
               <span

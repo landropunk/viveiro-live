@@ -38,7 +38,7 @@ export type BlogPostInput = {
  */
 export async function getAllBlogPosts(): Promise<BlogPost[]> {
   const supabase = createClient()
-  const { data, error } = await supabase
+  const { data, error} = await supabase
     .from('blog_posts')
     .select('*')
     .order('created_at', { ascending: false })

@@ -16,14 +16,16 @@ export { getAllSettings as getSettings }
  * Verifica si los usuarios pueden editar su perfil
  */
 export async function canUsersEditProfile(): Promise<boolean> {
-  const value = await getSetting('users_can_edit_profile')
-  return value === true || value === 'true'
+  const setting = await getSetting('users_can_edit_profile')
+  if (!setting) return false
+  return setting.value === true || setting.value === 'true'
 }
 
 /**
  * Verifica si está habilitado el restablecimiento de contraseña
  */
 export async function isPasswordResetEnabled(): Promise<boolean> {
-  const value = await getSetting('password_reset_enabled')
-  return value === true || value === 'true'
+  const setting = await getSetting('password_reset_enabled')
+  if (!setting) return false
+  return setting.value === true || setting.value === 'true'
 }
