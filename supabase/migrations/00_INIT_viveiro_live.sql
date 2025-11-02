@@ -397,6 +397,110 @@ COMMENT ON COLUMN public.blog_posts.slug IS 'URL amigable generada automáticame
 COMMENT ON COLUMN public.blog_posts.tags IS 'Array de etiquetas para categorización';
 
 -- ============================================================================
+-- 5. SISTEMA DE LIVE STREAMS / PLAY
+-- ============================================================================
+
+-- Tabla de streams en vivo y vídeos
+CREATE TABLE IF NOT EXISTS public.live_streams (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  platform TEXT NOT NULL CHECK (platform IN ('youtube', 'twitch', 'vimeo', 'facebook', 'other')),
+  video_url TEXT NOT NULL,
+  video_id TEXT,
+  stream_type TEXT NOT NULL DEFAULT 'live' CHECK (stream_type IN ('live', 'recorded', 'scheduled')),
+  category TEXT,
+  tags TEXT[] DEFAULT '{}',
+  thumbnail_url TEXT,
+  is_active BOOLEAN DEFAULT true,
+  is_featured BOOLEAN DEFAULT false,
+  scheduled_start TIMESTAMP WITH TIME ZONE,
+  scheduled_end TIMESTAMP WITH TIME ZONE,
+  view_count INTEGER DEFAULT 0,
+  display_order INTEGER DEFAULT 0,
+  author_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Índices para live_streams
+CREATE INDEX IF NOT EXISTS idx_live_streams_platform ON public.live_streams(platform);
+CREATE INDEX IF NOT EXISTS idx_live_streams_type ON public.live_streams(stream_type);
+CREATE INDEX IF NOT EXISTS idx_live_streams_active ON public.live_streams(is_active) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_live_streams_featured ON public.live_streams(is_featured) WHERE is_featured = true;
+CREATE INDEX IF NOT EXISTS idx_live_streams_scheduled ON public.live_streams(scheduled_start DESC);
+CREATE INDEX IF NOT EXISTS idx_live_streams_search
+  ON public.live_streams
+  USING gin(to_tsvector('spanish', coalesce(title, '') || ' ' || coalesce(description, '')));
+
+-- Trigger para updated_at en live_streams
+CREATE OR REPLACE FUNCTION public.update_live_streams_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = timezone('utc'::text, now());
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_live_streams_updated_at
+  BEFORE UPDATE ON public.live_streams
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_live_streams_updated_at();
+
+-- RLS para live_streams
+ALTER TABLE public.live_streams ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Streams activos son visibles para usuarios autenticados"
+  ON public.live_streams
+  FOR SELECT
+  USING (auth.role() = 'authenticated' AND is_active = true);
+
+CREATE POLICY "Administradores pueden ver todos los streams"
+  ON public.live_streams
+  FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE user_profiles.user_id = auth.uid() AND user_profiles.role = 'admin'
+    )
+  );
+
+CREATE POLICY "Solo administradores pueden crear streams"
+  ON public.live_streams
+  FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE user_profiles.user_id = auth.uid() AND user_profiles.role = 'admin'
+    )
+  );
+
+CREATE POLICY "Solo administradores pueden actualizar streams"
+  ON public.live_streams
+  FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE user_profiles.user_id = auth.uid() AND user_profiles.role = 'admin'
+    )
+  );
+
+CREATE POLICY "Solo administradores pueden eliminar streams"
+  ON public.live_streams
+  FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE user_profiles.user_id = auth.uid() AND user_profiles.role = 'admin'
+    )
+  );
+
+-- Comentarios
+COMMENT ON TABLE public.live_streams IS 'Streams en vivo y vídeos grabados de plataformas externas';
+COMMENT ON COLUMN public.live_streams.platform IS 'Plataforma: youtube, twitch, vimeo, facebook, other';
+COMMENT ON COLUMN public.live_streams.stream_type IS 'Tipo: live (en vivo), recorded (grabado), scheduled (programado)';
+
+-- ============================================================================
 -- FIN DE LA MIGRACIÓN INICIAL
 -- ============================================================================
 
@@ -419,4 +523,9 @@ UNION ALL
 SELECT
   'blog_posts' as tabla,
   COUNT(*) as registros
-FROM public.blog_posts;
+FROM public.blog_posts
+UNION ALL
+SELECT
+  'live_streams' as tabla,
+  COUNT(*) as registros
+FROM public.live_streams;
