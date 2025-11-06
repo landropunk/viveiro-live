@@ -55,12 +55,13 @@ export async function updateSession(request: NextRequest) {
   if (user && !request.nextUrl.pathname.startsWith('/complete-profile') && !request.nextUrl.pathname.startsWith('/api/')) {
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('full_name, city')
+      .select('full_name, city, birth_date')
       .eq('id', user.id)
       .single()
 
     // Si el perfil no existe o está incompleto, redirigir a complete-profile
-    const isProfileIncomplete = !profile || !profile.full_name || !profile.city
+    // Campos obligatorios: full_name, city, birth_date
+    const isProfileIncomplete = !profile || !profile.full_name || !profile.city || !profile.birth_date
 
     if (isProfileIncomplete && (request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/admin'))) {
       const url = request.nextUrl.clone()

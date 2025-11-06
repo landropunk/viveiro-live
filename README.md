@@ -446,3 +446,25 @@ Ver **[docs/README.md](./docs/README.md)** para el índice completo de documenta
 ---
 
 **Última actualización**: 30 de octubre de 2024
+
+---
+
+## 🧹 Limpieza y Mantenimiento (Nov 2025)
+
+El proyecto ha sido auditado y limpiado para mantener el código eficiente y organizado:
+
+### ✅ Cambios Realizados:
+
+- 🗑️ Eliminado directorio `app/setup/` vacío
+- 🗑️ Eliminado test obsoleto `Button.test.tsx`
+- 📁 Archivos HTML helper movidos a `docs/helpers/`
+- 📖 Documentación OAuth consolidada en `docs/setup/oauth/OAUTH_GUIDE.md`
+- 📚 Documentación de migraciones archivada en `docs/archive/`
+- 🔧 Archivos `.env` duplicados eliminados
+
+### 📊 Informe Completo:
+
+Ver [ANALISIS_CODIGO_COMPLETO.md](ANALISIS_CODIGO_COMPLETO.md) para detalles del análisis.
+
+**Estado del Proyecto:** ✅ LIMPIO Y OPTIMIZADO
+

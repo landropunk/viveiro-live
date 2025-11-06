@@ -19,9 +19,14 @@ export async function GET() {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Verificar que es admin
-    const isAdmin = user.user_metadata?.role === 'admin';
-    if (!isAdmin) {
+    // Verificar que es admin desde user_profiles
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile || profile.role !== 'admin') {
       return NextResponse.json({ error: 'Acceso denegado' }, { status: 403 });
     }
 
@@ -53,9 +58,14 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Verificar que es admin
-    const isAdmin = user.user_metadata?.role === 'admin';
-    if (!isAdmin) {
+    // Verificar que es admin desde user_profiles
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile || profile.role !== 'admin') {
       return NextResponse.json({ error: 'Acceso denegado' }, { status: 403 });
     }
 

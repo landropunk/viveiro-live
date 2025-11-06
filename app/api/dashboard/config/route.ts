@@ -29,9 +29,11 @@ export async function GET() {
     // Devolver configuración por defecto en caso de error
     return NextResponse.json({
       meteo: true,
-      historicos: false,
-      live: true,
+      historicos: true,
+      eventos: true,
       webcams: true,
+      seccion5: false,
+      seccion6: false,
     });
   }
 }

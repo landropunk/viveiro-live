@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 type AdminCard = {
   title: string;
@@ -9,6 +11,13 @@ type AdminCard = {
   icon: string;
   href: string;
   color: string;
+};
+
+type Stats = {
+  publishedPosts: number;
+  activeWebcams: number;
+  liveStreams: number;
+  totalUsers: number;
 };
 
 const adminCards: AdminCard[] = [
@@ -35,9 +44,9 @@ const adminCards: AdminCard[] = [
   },
   {
     title: 'Live / Play',
-    description: 'Gestiona videos y transmisiones en directo de YouTube',
+    description: 'Gestiona vídeos y transmisiones en directo de YouTube',
     icon: '📺',
-    href: '/admin/live-content',
+    href: '/admin/live-streams',
     color: 'from-red-500 to-orange-500',
   },
   {
@@ -51,6 +60,57 @@ const adminCards: AdminCard[] = [
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const [stats, setStats] = useState<Stats>({
+    publishedPosts: 0,
+    activeWebcams: 0,
+    liveStreams: 0,
+    totalUsers: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    try {
+      const supabase = createClient();
+
+      // Cargar posts publicados
+      const { count: postsCount } = await supabase
+        .from('blog_posts')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_published', true);
+
+      // Cargar webcams activas
+      const { count: webcamsCount } = await supabase
+        .from('webcams')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
+
+      // Cargar streams activos
+      const { count: streamsCount } = await supabase
+        .from('live_streams')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
+
+      // Cargar total de usuarios
+      const { count: usersCount } = await supabase
+        .from('user_profiles')
+        .select('*', { count: 'exact', head: true });
+
+      setStats({
+        publishedPosts: postsCount || 0,
+        activeWebcams: webcamsCount || 0,
+        liveStreams: streamsCount || 0,
+        totalUsers: usersCount || 0,
+      });
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -73,7 +133,7 @@ export default function AdminDashboard() {
                 Posts Publicados
               </p>
               <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                0
+                {loading ? '...' : stats.publishedPosts}
               </p>
             </div>
             <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20">
@@ -89,7 +149,7 @@ export default function AdminDashboard() {
                 Webcams Activas
               </p>
               <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                0
+                {loading ? '...' : stats.activeWebcams}
               </p>
             </div>
             <div className="rounded-full bg-purple-100 p-3 dark:bg-purple-900/20">
@@ -105,7 +165,7 @@ export default function AdminDashboard() {
                 Contenido Live/Play
               </p>
               <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                0
+                {loading ? '...' : stats.liveStreams}
               </p>
             </div>
             <div className="rounded-full bg-red-100 p-3 dark:bg-red-900/20">
@@ -121,7 +181,7 @@ export default function AdminDashboard() {
                 Usuarios Totales
               </p>
               <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                0
+                {loading ? '...' : stats.totalUsers}
               </p>
             </div>
             <div className="rounded-full bg-green-100 p-3 dark:bg-green-900/20">

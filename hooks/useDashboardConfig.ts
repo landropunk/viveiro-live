@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 interface DashboardConfig {
   meteo: boolean;
   historicos: boolean;
-  live: boolean;
+  eventos: boolean;
   webcams: boolean;
   seccion5: boolean;
   seccion6: boolean;
@@ -16,8 +16,8 @@ interface DashboardConfig {
 export function useDashboardConfig() {
   const [config, setConfig] = useState<DashboardConfig>({
     meteo: true,
-    historicos: false,
-    live: true,
+    historicos: true,
+    eventos: true,
     webcams: true,
     seccion5: false,
     seccion6: false,

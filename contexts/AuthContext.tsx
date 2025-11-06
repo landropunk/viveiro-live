@@ -68,7 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
     })
     if (!error) {
-      router.push('/dashboard')
+      // Redirigir a complete-profile para que el usuario complete su información
+      router.push('/complete-profile')
       router.refresh()
     }
     return { error }

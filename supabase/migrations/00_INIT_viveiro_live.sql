@@ -110,6 +110,27 @@ SELECT
 FROM auth.users
 ON CONFLICT (id) DO NOTHING;
 
+-- Función para crear perfil automáticamente al registrar un nuevo usuario
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.user_profiles (id, email, full_name, role)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
+    COALESCE(NEW.raw_user_meta_data->>'role', 'user')
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger que se ejecuta cuando se crea un nuevo usuario en auth.users
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
 -- Comentarios
 COMMENT ON TABLE user_profiles IS 'Perfiles extendidos de usuarios con información personal y rol';
 COMMENT ON COLUMN user_profiles.role IS 'Rol del usuario: user (normal) o admin (administrador)';
@@ -158,6 +179,7 @@ ALTER TABLE app_settings ENABLE ROW LEVEL SECURITY;
 -- Políticas RLS
 DROP POLICY IF EXISTS "Authenticated users can read settings" ON app_settings;
 DROP POLICY IF EXISTS "Service role can update settings" ON app_settings;
+DROP POLICY IF EXISTS "Admins can update settings" ON app_settings;
 
 CREATE POLICY "Authenticated users can read settings"
   ON app_settings FOR SELECT
@@ -167,32 +189,53 @@ CREATE POLICY "Service role can update settings"
   ON app_settings FOR ALL
   USING (auth.jwt()->>'role' = 'service_role');
 
+CREATE POLICY "Admins can update settings"
+  ON app_settings FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
 -- Insertar configuraciones por defecto
 INSERT INTO app_settings (key, label, value, description, category, locked) VALUES
   -- Configuración de usuarios
-  ('users_can_edit_profile', 'Los usuarios pueden editar su perfil', 'true', 'Permite que los usuarios editen su propio perfil', 'users', false),
-  ('users_can_change_email', 'Los usuarios pueden cambiar su email', 'false', 'Permite que los usuarios cambien su email', 'users', false),
-  ('default_user_role', 'Rol por defecto', '"user"', 'Rol por defecto para nuevos usuarios', 'users', false),
+  ('users_can_edit_profile', 'Los usuarios pueden editar su perfil', '{"enabled": true}', 'Permite que los usuarios editen su propio perfil', 'users', false),
+  ('users_can_change_email', 'Los usuarios pueden cambiar su email', '{"enabled": false}', 'Permite que los usuarios cambien su email', 'users', false),
+  ('default_user_role', 'Rol por defecto', '{"value": "user"}', 'Rol por defecto para nuevos usuarios', 'users', false),
 
   -- Configuración de autenticación
-  ('require_email_verification', 'Requiere verificación de email', 'true', 'Requiere verificación de email para nuevos usuarios', 'auth', false),
-  ('allow_user_registration', 'Permitir registro de nuevos usuarios', 'true', 'Permite que nuevos usuarios se registren', 'auth', false),
-  ('password_reset_enabled', 'Permitir restablecimiento de contraseña', 'true', 'Permite que los usuarios restablezcan su contraseña', 'auth', false),
+  ('require_email_verification', 'Requiere verificación de email', '{"enabled": true}', 'Requiere verificación de email para nuevos usuarios', 'auth', false),
+  ('allow_user_registration', 'Permitir registro de nuevos usuarios', '{"enabled": true}', 'Permite que nuevos usuarios se registren', 'auth', false),
+  ('password_reset_enabled', 'Permitir restablecimiento de contraseña', '{"enabled": true}', 'Permite que los usuarios restablezcan su contraseña', 'auth', false),
 
-  -- Secciones del dashboard (las 4 principales están activas)
+  -- Secciones del dashboard operativas
   ('section_meteo', 'Sección Meteorología', '{"enabled": true}', 'Mostrar sección de meteorología en el dashboard', 'sections', false),
   ('section_historicos', 'Sección Históricos', '{"enabled": true}', 'Mostrar sección de históricos en el dashboard', 'sections', false),
   ('section_webcams', 'Sección Webcams', '{"enabled": true}', 'Mostrar sección de webcams en el dashboard', 'sections', false),
   ('section_eventos', 'Sección Live/Play', '{"enabled": true}', 'Mostrar sección de eventos en vivo en el dashboard', 'sections', false),
 
-  -- Secciones preparadas para futuro (bloqueadas)
+  -- Secciones preparadas para futuro (al final, bloqueadas)
   ('section_seccion5', 'Sección 5', '{"enabled": false}', 'Sección adicional personalizable (requiere implementación)', 'sections', true),
   ('section_seccion6', 'Sección 6', '{"enabled": false}', 'Sección adicional personalizable (requiere implementación)', 'sections', true),
 
   -- Configuración general
-  ('general_site_name', 'Nombre del sitio', '"ViveiroLive"', 'Nombre dinámico del sitio (requiere activación en código)', 'general', true),
-  ('blog_show_on_home', 'Mostrar blog en inicio', 'true', 'Mostrar últimos posts del blog en la página de inicio', 'general', false)
-ON CONFLICT (key) DO NOTHING;
+  ('general_site_name', 'Nombre del sitio', '{"value": "ViveiroLive"}', 'Nombre dinámico del sitio (requiere activación en código)', 'general', true),
+  ('blog_show_on_home', 'Mostrar blog en inicio', '{"enabled": true}', 'Mostrar últimos posts del blog en la página de inicio', 'general', false)
+ON CONFLICT (key) DO UPDATE SET
+  label = EXCLUDED.label,
+  description = EXCLUDED.description,
+  category = EXCLUDED.category,
+  locked = EXCLUDED.locked,
+  updated_at = NOW();
 
 -- Comentarios
 COMMENT ON TABLE app_settings IS 'Configuración global de la aplicación controlada por administradores';
@@ -396,6 +439,44 @@ COMMENT ON TABLE public.blog_posts IS 'Posts del blog/noticias de Viveiro Live';
 COMMENT ON COLUMN public.blog_posts.slug IS 'URL amigable generada automáticamente desde el título';
 COMMENT ON COLUMN public.blog_posts.tags IS 'Array de etiquetas para categorización';
 
+-- Crear post de bienvenida automáticamente
+DO $$
+DECLARE
+  admin_user_id UUID;
+BEGIN
+  -- Buscar el primer usuario con rol admin
+  SELECT id INTO admin_user_id
+  FROM user_profiles
+  WHERE role = 'admin'
+  LIMIT 1;
+
+  -- Si existe un admin, crear el post de bienvenida
+  IF admin_user_id IS NOT NULL THEN
+    INSERT INTO public.blog_posts (
+      title,
+      slug,
+      excerpt,
+      content,
+      category,
+      tags,
+      is_published,
+      published_at,
+      author_id
+    ) VALUES (
+      'Bienvenido a Viveiro Live',
+      'bienvenido-a-viveiro-live',
+      'Tu portal informativo local con datos meteorológicos en tiempo real, webcams, eventos y mucho más.',
+      E'# Bienvenido a Viveiro Live\n\n**Viveiro Live** es tu nuevo portal de información local que reúne todo lo que necesitas saber sobre Viveiro en un solo lugar.\n\n## ¿Qué encontrarás aquí?\n\n### 📊 Meteorología en tiempo real\nDatos actualizados de las estaciones meteorológicas de MeteoGalicia, con históricos y gráficas detalladas.\n\n### 📹 Webcams en directo\nVistas en tiempo real de los lugares más emblemáticos de Viveiro.\n\n### 📺 Live / Play\nRetransmisiones en directo y vídeos de eventos locales, fiestas, conciertos y mucho más.\n\n### 📰 Noticias locales\nMantente al día con las últimas noticias y eventos de tu localidad.\n\n---\n\n¡Gracias por visitar Viveiro Live! Estamos trabajando constantemente para mejorar y añadir nuevas funcionalidades.',
+      'Anuncios',
+      ARRAY['bienvenida', 'viveiro', 'portal'],
+      true,
+      NOW(),
+      admin_user_id
+    )
+    ON CONFLICT (slug) DO NOTHING;
+  END IF;
+END $$;
+
 -- ============================================================================
 -- 5. SISTEMA DE LIVE STREAMS / PLAY
 -- ============================================================================
@@ -461,7 +542,7 @@ CREATE POLICY "Administradores pueden ver todos los streams"
   USING (
     EXISTS (
       SELECT 1 FROM public.user_profiles
-      WHERE user_profiles.user_id = auth.uid() AND user_profiles.role = 'admin'
+      WHERE user_profiles.id = auth.uid() AND user_profiles.role = 'admin'
     )
   );
 
@@ -471,7 +552,7 @@ CREATE POLICY "Solo administradores pueden crear streams"
   WITH CHECK (
     EXISTS (
       SELECT 1 FROM public.user_profiles
-      WHERE user_profiles.user_id = auth.uid() AND user_profiles.role = 'admin'
+      WHERE user_profiles.id = auth.uid() AND user_profiles.role = 'admin'
     )
   );
 
@@ -481,7 +562,7 @@ CREATE POLICY "Solo administradores pueden actualizar streams"
   USING (
     EXISTS (
       SELECT 1 FROM public.user_profiles
-      WHERE user_profiles.user_id = auth.uid() AND user_profiles.role = 'admin'
+      WHERE user_profiles.id = auth.uid() AND user_profiles.role = 'admin'
     )
   );
 
@@ -491,7 +572,7 @@ CREATE POLICY "Solo administradores pueden eliminar streams"
   USING (
     EXISTS (
       SELECT 1 FROM public.user_profiles
-      WHERE user_profiles.user_id = auth.uid() AND user_profiles.role = 'admin'
+      WHERE user_profiles.id = auth.uid() AND user_profiles.role = 'admin'
     )
   );
 

@@ -127,7 +127,21 @@ export default function EditStreamPage() {
 
         <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-950">
           <LiveStreamForm
-            initialData={stream}
+            initialData={{
+              title: stream.title,
+              description: stream.description ?? undefined,
+              platform: stream.platform,
+              video_url: stream.video_url,
+              stream_type: stream.stream_type,
+              category: stream.category ?? undefined,
+              tags: stream.tags,
+              thumbnail_url: stream.thumbnail_url ?? undefined,
+              is_active: stream.is_active,
+              is_featured: stream.is_featured,
+              scheduled_start: stream.scheduled_start ?? undefined,
+              scheduled_end: stream.scheduled_end ?? undefined,
+              display_order: stream.display_order,
+            }}
             onSubmit={handleSubmit}
             submitLabel={submitting ? 'Guardando...' : 'Guardar Cambios'}
             disabled={submitting}

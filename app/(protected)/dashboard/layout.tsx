@@ -56,7 +56,7 @@ const baseSections: SectionLink[] = [
     enabled: false,
   },
   {
-    id: 'live',
+    id: 'eventos',
     name: 'Live / Play',
     icon: <LiveIcon className="h-5 w-5" />,
     path: '/dashboard/eventos',
@@ -88,7 +88,7 @@ const baseSections: SectionLink[] = [
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
-  const isAdmin = useIsAdmin();
+  const { isAdmin, loading: isAdminLoading } = useIsAdmin();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { config, loading: configLoading } = useDashboardConfig();
 
@@ -222,6 +222,23 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             <span>Mi Espacio</span>
           </Link>
 
+          {/* Mi Perfil */}
+          <Link
+            href="/dashboard/profile"
+            onClick={closeSidebar}
+            className={`
+              flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors
+              ${
+                pathname === '/dashboard/profile'
+                  ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+              }
+            `}
+          >
+            <span className="mr-3 text-xl">👤</span>
+            <span>Mi Perfil</span>
+          </Link>
+
           {/* Admin Access */}
           {isAdmin && (
             <Link
@@ -238,54 +255,61 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <div className="my-3 border-t border-gray-200 dark:border-gray-800"></div>
 
           {/* Sections */}
-          {sections.map((section) => {
-            const isActive = pathname?.startsWith(section.path);
+          {!isAdmin && configLoading ? (
+            // Usuarios no admin: mostrar loading mientras carga configuración
+            <div className="flex items-center justify-center px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+              Cargando secciones...
+            </div>
+          ) : (
+            sections.map((section) => {
+              const isActive = pathname?.startsWith(section.path);
 
-            // Si está deshabilitada
-            if (!section.enabled) {
-              // Usuarios normales no ven secciones deshabilitadas
-              if (!isAdmin) {
-                return null;
+              // Si está deshabilitada
+              if (!section.enabled) {
+                // Usuarios normales no ven secciones deshabilitadas
+                if (!isAdmin) {
+                  return null;
+                }
+
+                // Administradores ven secciones deshabilitadas con candado
+                return (
+                  <div
+                    key={section.id}
+                    className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-400 opacity-50 dark:text-gray-600"
+                    title="Deshabilitado - Solo visible para administradores"
+                  >
+                    <span className={typeof section.icon === 'string' ? 'mr-3 text-xl' : 'mr-3'}>
+                      {section.icon}
+                    </span>
+                    <span>{section.name}</span>
+                    <span className="ml-auto text-xs">🔒</span>
+                  </div>
+                );
               }
 
-              // Administradores ven secciones deshabilitadas con candado
+              // Sección habilitada (todos los usuarios la ven)
               return (
-                <div
+                <Link
                   key={section.id}
-                  className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-400 opacity-50 dark:text-gray-600"
-                  title="Deshabilitado - Solo visible para administradores"
+                  href={section.path}
+                  onClick={closeSidebar}
+                  className={`
+                    flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                    ${
+                      isActive
+                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                    }
+                  `}
                 >
                   <span className={typeof section.icon === 'string' ? 'mr-3 text-xl' : 'mr-3'}>
                     {section.icon}
                   </span>
                   <span>{section.name}</span>
-                  <span className="ml-auto text-xs">🔒</span>
-                </div>
+                </Link>
               );
-            }
-
-            // Sección habilitada (todos los usuarios la ven)
-            return (
-              <Link
-                key={section.id}
-                href={section.path}
-                onClick={closeSidebar}
-                className={`
-                  flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                  ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-                  }
-                `}
-              >
-                <span className={typeof section.icon === 'string' ? 'mr-3 text-xl' : 'mr-3'}>
-                  {section.icon}
-                </span>
-                <span>{section.name}</span>
-              </Link>
-            );
-          })}
+            })
+          )}
         </nav>
 
         {/* User Info & Logout (Bottom) */}

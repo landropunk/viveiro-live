@@ -18,7 +18,8 @@ export { getAllSettings as getSettings }
 export async function canUsersEditProfile(): Promise<boolean> {
   const setting = await getSetting('users_can_edit_profile')
   if (!setting) return false
-  return setting.value === true || setting.value === 'true'
+  // El formato es {"enabled": true/false}
+  return setting.value?.enabled === true
 }
 
 /**
@@ -27,5 +28,6 @@ export async function canUsersEditProfile(): Promise<boolean> {
 export async function isPasswordResetEnabled(): Promise<boolean> {
   const setting = await getSetting('password_reset_enabled')
   if (!setting) return false
-  return setting.value === true || setting.value === 'true'
+  // El formato es {"enabled": true/false}
+  return setting.value?.enabled === true
 }

@@ -232,7 +232,7 @@ export default function Home() {
               )}
 
               {/* Live/Play */}
-              {sectionsConfig.live && (
+              {sectionsConfig.eventos && (
               <Link href={user ? "/dashboard/eventos" : "/auth/login"}>
                 <motion.div
                   variants={itemVariants}

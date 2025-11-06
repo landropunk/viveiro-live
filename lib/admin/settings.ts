@@ -27,7 +27,7 @@ export async function getAllSettings(): Promise<AppSetting[]> {
     .from('app_settings')
     .select('*')
     .order('category', { ascending: true })
-    .order('label', { ascending: true });
+    .order('created_at', { ascending: true });
 
   if (error) {
     console.error('Error obteniendo configuración:', error);
@@ -49,7 +49,7 @@ export async function getSettingsByCategory(
     .from('app_settings')
     .select('*')
     .eq('category', category)
-    .order('label', { ascending: true });
+    .order('created_at', { ascending: true });
 
   if (error) {
     console.error(`Error obteniendo configuración de categoría ${category}:`, error);

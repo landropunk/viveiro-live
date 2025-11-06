@@ -32,10 +32,10 @@ const adminLinks: AdminLink[] = [
     path: '/admin/webcams',
   },
   {
-    id: 'live-content',
+    id: 'live-streams',
     name: 'Live / Play',
     icon: '📺',
-    path: '/admin/live-content',
+    path: '/admin/live-streams',
   },
   {
     id: 'users',

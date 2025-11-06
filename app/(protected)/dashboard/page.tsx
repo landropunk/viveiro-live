@@ -35,7 +35,7 @@ const baseSections: SectionType[] = [
     enabled: false,
   },
   {
-    id: 'live',
+    id: 'eventos',
     name: 'Live / Play',
     description: 'Eventos en directo, retransmisiones y contenido multimedia',
     icon: '🔴',
@@ -71,7 +71,7 @@ const baseSections: SectionType[] = [
 export default function DashboardPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const isAdmin = useIsAdmin();
+  const { isAdmin } = useIsAdmin();
   const { config, loading: configLoading } = useDashboardConfig();
 
   // Aplicar configuración dinámica a las secciones
