@@ -9,7 +9,6 @@ import AnimatedSection from "@/components/AnimatedSection";
 import { useAuth } from "@/contexts/AuthContext";
 import type { BlogPost } from "@/lib/admin/blog";
 import { createClient } from "@/lib/supabase/client";
-import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -32,26 +31,59 @@ const itemVariants = {
 
 export default function Home() {
   const { user } = useAuth();
-  const { config: sectionsConfig } = useDashboardConfig();
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [blogEnabled, setBlogEnabled] = useState(true);
+  const [sectionsConfig, setSectionsConfig] = useState({
+    meteo: true,
+    historicos: true,
+    webcams: true,
+    eventos: true,
+  });
 
   useEffect(() => {
-    const loadBlogConfig = async () => {
+    const loadPublicConfig = async () => {
       try {
         const supabase = createClient();
-        const { data } = await supabase
-          .from('app_settings')
-          .select('value')
-          .eq('key', 'feature_blog')
-          .single();
 
-        if (data) {
-          setBlogEnabled(data.value?.enabled === true);
+        // Cargar configuración de secciones del dashboard
+        const { data: settings } = await supabase
+          .from('app_settings')
+          .select('key, value')
+          .in('key', [
+            'dashboard_section_meteo',
+            'dashboard_section_historicos',
+            'dashboard_section_webcams',
+            'dashboard_section_eventos',
+            'feature_blog'
+          ]);
+
+        if (settings) {
+          const config = {
+            meteo: true,
+            historicos: true,
+            webcams: true,
+            eventos: true,
+          };
+
+          settings.forEach((setting) => {
+            if (setting.key === 'dashboard_section_meteo') {
+              config.meteo = setting.value?.enabled === true;
+            } else if (setting.key === 'dashboard_section_historicos') {
+              config.historicos = setting.value?.enabled === true;
+            } else if (setting.key === 'dashboard_section_webcams') {
+              config.webcams = setting.value?.enabled === true;
+            } else if (setting.key === 'dashboard_section_eventos') {
+              config.eventos = setting.value?.enabled === true;
+            } else if (setting.key === 'feature_blog') {
+              setBlogEnabled(setting.value?.enabled === true);
+            }
+          });
+
+          setSectionsConfig(config);
         }
       } catch (error) {
-        console.error('Error loading blog config:', error);
+        console.error('Error loading public config:', error);
       }
     };
 
@@ -78,7 +110,7 @@ export default function Home() {
       }
     };
 
-    loadBlogConfig();
+    loadPublicConfig();
     loadBlogPosts();
   }, []);
 
