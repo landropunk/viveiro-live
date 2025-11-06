@@ -15,10 +15,10 @@ interface DashboardConfig {
  */
 export function useDashboardConfig() {
   const [config, setConfig] = useState<DashboardConfig>({
-    meteo: false,
-    historicos: false,
-    eventos: false,
-    webcams: false,
+    meteo: true,
+    historicos: true,
+    eventos: true,
+    webcams: true,
     seccion5: false,
     seccion6: false,
   });
