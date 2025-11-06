@@ -32,7 +32,7 @@ const itemVariants = {
 
 export default function Home() {
   const { user } = useAuth();
-  const { config: sectionsConfig } = useDashboardConfig();
+  const { config: sectionsConfig, loading: loadingConfig } = useDashboardConfig();
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [blogEnabled, setBlogEnabled] = useState(true);
