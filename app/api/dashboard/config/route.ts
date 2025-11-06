@@ -11,15 +11,8 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    }
-
+    // Este endpoint es público - no requiere autenticación
+    // Necesario para mostrar correctamente la página de inicio
     const config = await getDashboardSectionsConfig();
 
     return NextResponse.json(config);
