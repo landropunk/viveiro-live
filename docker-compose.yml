@@ -1,0 +1,79 @@
+# ============================================================================
+# Docker Compose - Viveiro Live Frontend
+# ============================================================================
+# Stack INDEPENDIENTE del backend Supabase
+# Se conecta al backend via HTTPS a https://api.viveiro.live (NPM reverse proxy)
+#
+# IMPORTANTE: Las credenciales se cargan desde .env.production
+# Copia .env.production al servidor antes de hacer docker compose up
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ==========================================================================
+  # VIVEIRO LIVE - APLICACIÓN NEXT.JS
+  # ==========================================================================
+  app:
+    container_name: viveiro-live
+    env_file:
+      - .env.production
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        METEOGALICIA_API_KEY: ${METEOGALICIA_API_KEY}
+        NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      # Supabase - Conecta via HTTPS (NPM reverse proxy)
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      # Site URL
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+      # API Keys
+      METEOGALICIA_API_KEY: ${METEOGALICIA_API_KEY}
+      NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - viveiro-network
+
+# ============================================================================
+# RED DOCKER COMPARTIDA CON SUPABASE
+# ============================================================================
+networks:
+  viveiro-network:
+    external: true
+    name: viveiro-network
+
+# ============================================================================
+# NOTAS:
+# ============================================================================
+# - Este stack comparte red Docker con Supabase mediante "viveiro-network"
+# - Conexión CLIENT-SIDE (navegador): https://api.viveiro.live (NPM → Kong:8000)
+# - Conexión SERVER-SIDE (Next.js): http://supabase-kong:8000 (directo via Docker)
+# - Frontend accesible en: https://viveiro.live (NPM → 185.223.31.88:3000)
+# - Ventajas:
+#   ✅ Comunicación interna optimizada (sin pasar por NPM)
+#   ✅ Mejor rendimiento para SSR
+#   ✅ OAuth funciona correctamente (tráfico del navegador via HTTPS)
+#   ✅ Seguridad: red interna Docker para comunicación server-side
+#
+# Comandos:
+#   Construir:  docker compose build
+#   Iniciar:    docker compose up -d
+#   Ver logs:   docker compose logs -f
+#   Detener:    docker compose down
+#   Reiniciar:  docker compose restart
+# ============================================================================
