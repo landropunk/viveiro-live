@@ -1,111 +1,304 @@
 'use client';
 
-import { ExternalLink, Calendar, Database, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
+import { Calendar, Database, Download, RefreshCw } from 'lucide-react';
+import { VIVEIRO_STATIONS } from '@/lib/meteogalicia-stations';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  TimeScale,
+} from 'chart.js';
+import 'chartjs-adapter-date-fns';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  TimeScale
+);
+
+interface HistoricalDataPoint {
+  timestamp: string;
+  temperature?: number;
+  humidity?: number;
+  precipitation?: number;
+  windSpeed?: number;
+  windDirection?: number;
+  pressure?: number;
+  [key: string]: any;
+}
 
 export default function HistoricalDataSection() {
-  const handleOpenHistoricos = () => {
-    window.open(
-      'https://www.meteogalicia.gal/web/observacion/rede-meteoroloxica/historico',
-      '_blank',
-      'noopener,noreferrer'
-    );
+  const [selectedStation, setSelectedStation] = useState<number>(10104);
+  const [startDate, setStartDate] = useState<string>('');
+  const [numHours, setNumHours] = useState<number>(12);
+  const [selectedParameter, setSelectedParameter] = useState<string>('temperature');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<HistoricalDataPoint[]>([]);
+
+  // Parámetros disponibles
+  const parameters = [
+    { value: 'temperature', label: 'Temperatura (°C)', key: 'temperature' },
+    { value: 'humidity', label: 'Humedad (%)', key: 'humidity' },
+    { value: 'precipitation', label: 'Precipitación (mm)', key: 'precipitation' },
+    { value: 'windSpeed', label: 'Velocidad del Viento (km/h)', key: 'windSpeed' },
+    { value: 'pressure', label: 'Presión (hPa)', key: 'pressure' },
+  ];
+
+  const handleFetchData = async () => {
+    if (!startDate) {
+      setError('Por favor selecciona una fecha de inicio');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Formatear fecha a DD/MM/YYYY HH:MM
+      const date = new Date(startDate);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = String(date.getHours()).padStart(2, '0');
+      const formattedDate = `${day}/${month}/${year} ${hours}:00`;
+
+      const url = `/api/protected/stations/historical?stationId=${selectedStation}&startDateTime=${encodeURIComponent(formattedDate)}&numHours=${numHours}`;
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al obtener datos históricos');
+      }
+
+      const result = await response.json();
+      setData(result.data || []);
+
+      if (!result.data || result.data.length === 0) {
+        setError('No hay datos disponibles para el período seleccionado.');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Preparar datos para el gráfico
+  const chartData = {
+    labels: data.map(d => new Date(d.timestamp)),
+    datasets: [
+      {
+        label: parameters.find(p => p.value === selectedParameter)?.label || selectedParameter,
+        data: data.map(d => d[selectedParameter]),
+        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        tension: 0.4,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top' as const,
+      },
+      tooltip: {
+        mode: 'index' as const,
+        intersect: false,
+      },
+    },
+    scales: {
+      x: {
+        type: 'time' as const,
+        time: {
+          displayFormats: {
+            hour: 'HH:mm',
+            day: 'dd/MM',
+          },
+        },
+        title: {
+          display: true,
+          text: 'Fecha y Hora',
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: parameters.find(p => p.value === selectedParameter)?.label || '',
+        },
+      },
+    },
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 p-6">
-      <div className="flex items-start gap-4">
-        {/* Icono */}
-        <div className="flex-shrink-0">
-          <div className="w-12 h-12 bg-blue-600 dark:bg-blue-500 rounded-lg flex items-center justify-center">
-            <Database className="w-6 h-6 text-white" />
-          </div>
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <Database className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+          Consulta de Datos Históricos Horarios
+        </h3>
+      </div>
+
+      <p className="text-gray-600 dark:text-gray-400 mb-6">
+        Consulta y analiza los datos meteorológicos históricos de las estaciones de Viveiro
+      </p>
+
+      {/* Formulario */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Estación */}
+        <div>
+          <label htmlFor="station" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Estación
+          </label>
+          <select
+            id="station"
+            value={selectedStation}
+            onChange={(e) => setSelectedStation(Number(e.target.value))}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+          >
+            {VIVEIRO_STATIONS.map(station => (
+              <option key={station.id} value={station.id}>
+                {station.name} ({station.altitude}m)
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* Contenido */}
-        <div className="flex-1">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-            Datos Históricos Completos
-          </h3>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            Accede a los históricos oficiales de MeteoGalicia con datos desde 2005
-          </p>
+        {/* Fecha de Inicio */}
+        <div>
+          <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Fecha y Hora de Inicio
+          </label>
+          <input
+            type="datetime-local"
+            id="startDate"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            max={new Date().toISOString().slice(0, 16)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+          />
+        </div>
 
-          {/* Información de disponibilidad */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                Penedo do Galo (545m)
-              </h4>
-              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <li>• Diezminutales: desde 02/06/2005</li>
-                <li>• Horarias: desde 01/01/2006</li>
-                <li>• Diarias y Mensuales disponibles</li>
-              </ul>
-            </div>
+        {/* Número de Horas */}
+        <div>
+          <label htmlFor="numHours" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Número de Horas
+          </label>
+          <select
+            id="numHours"
+            value={numHours}
+            onChange={(e) => setNumHours(Number(e.target.value))}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+          >
+            <option value={4}>4 horas</option>
+            <option value={6}>6 horas</option>
+            <option value={12}>12 horas</option>
+          </select>
+        </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                Borreiros (59m)
-              </h4>
-              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <li>• Diezminutales: desde 02/06/2014</li>
-                <li>• Horarias: desde 01/07/2014</li>
-                <li>• Diarias y Mensuales disponibles</li>
-              </ul>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
-                Variables disponibles
-              </h4>
-              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <li>• Temperatura</li>
-                <li>• Humedad y Precipitación</li>
-                <li>• Viento y Radiación Solar</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Botón de acción */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={handleOpenHistoricos}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg"
-            >
-              <ExternalLink className="w-5 h-5" />
-              Abrir Históricos Oficiales
-            </button>
-
-            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 px-4">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>Se abrirá en nueva pestaña</span>
-            </div>
-          </div>
-
-          {/* Nota informativa */}
-          <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md">
-            <p className="text-sm text-blue-800 dark:text-blue-300">
-              <strong>Nota:</strong> Los datos históricos se consultan directamente en la interfaz oficial de
-              MeteoGalicia. Puedes descargar los datos en formato CSV para análisis personalizado.
-            </p>
-          </div>
+        {/* Parámetro */}
+        <div>
+          <label htmlFor="parameter" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Parámetro
+          </label>
+          <select
+            id="parameter"
+            value={selectedParameter}
+            onChange={(e) => setSelectedParameter(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+          >
+            {parameters.map(param => (
+              <option key={param.value} value={param.value}>
+                {param.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
+
+      {/* Botón de Consulta */}
+      <button
+        onClick={handleFetchData}
+        disabled={loading || !startDate}
+        className="w-full md:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        {loading ? (
+          <>
+            <RefreshCw className="w-5 h-5 animate-spin" />
+            Consultando...
+          </>
+        ) : (
+          <>
+            <Calendar className="w-5 h-5" />
+            Consultar Datos
+          </>
+        )}
+      </button>
+
+      {/* Mensaje de Error */}
+      {error && (
+        <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-sm text-red-800 dark:text-red-300">
+            <strong>Error:</strong> {error}
+          </p>
+        </div>
+      )}
+
+      {/* Gráfico */}
+      {data.length > 0 && (
+        <div className="mt-6">
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+            <div className="h-[400px]">
+              <Line data={chartData} options={chartOptions} />
+            </div>
+          </div>
+
+          {/* Información adicional */}
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <p className="text-sm font-medium text-blue-900 dark:text-blue-300">Total de Lecturas</p>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{data.length}</p>
+            </div>
+
+            {data.length > 0 && (
+              <>
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                  <p className="text-sm font-medium text-green-900 dark:text-green-300">Valor Mínimo</p>
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {Math.min(...data.map(d => d[selectedParameter]).filter(v => v !== undefined && v !== null)).toFixed(1)}
+                  </p>
+                </div>
+
+                <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
+                  <p className="text-sm font-medium text-orange-900 dark:text-orange-300">Valor Máximo</p>
+                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                    {Math.max(...data.map(d => d[selectedParameter]).filter(v => v !== undefined && v !== null)).toFixed(1)}
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

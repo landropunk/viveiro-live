@@ -1,0 +1,138 @@
+# ============================================================================
+# RESPALDO DE CLAVES Y CONFIGURACIONES - viveiro-live
+# Fecha: 2025-12-04 (Actualizado)
+# ============================================================================
+
+# ==============================================================================
+# SUPABASE LOCAL (Proxmox VM 185.223.31.88)
+# ==============================================================================
+NEXT_PUBLIC_SUPABASE_URL=https://api.viveiro.live
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzY0MTQzNTk3LCJleHAiOjIwNzk1MDM1OTd9.JCVxZrKIpWShIcOyUcD3ctXfMuxlK2AKo_nDV8gsjwA
+
+# Dashboard Supabase: https://api.viveiro.live
+# Usuario: landropunk
+# DB: postgresql://postgres:[password]@185.223.31.88:5432/postgres
+
+# ==============================================================================
+# SITE URL
+# ==============================================================================
+# Desarrollo Local:
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Producción:
+# NEXT_PUBLIC_SITE_URL=https://viveiro.live
+
+# ==============================================================================
+# API KEYS
+# ==============================================================================
+# MeteoGalicia API
+METEOGALICIA_API_KEY=e5Mx8wqEwpa03z56v7DZ2nKAfJ689hnR546iP4DCtdfNE32CRN8U8B265gm7j5CV
+
+# Google Maps API
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyCSNd0gYV2JR59I-aQmFrzp4BhcZ5yAMis
+
+# ==============================================================================
+# CONFIGURACIÓN SUPABASE AUTH (en /root/supabase-viveirolive/docker/.env)
+# ==============================================================================
+GOTRUE_SITE_URL=https://viveiro.live
+GOTRUE_EXTERNAL_GOOGLE_ENABLED=true
+GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID=[tu_client_id_de_google]
+GOTRUE_EXTERNAL_GOOGLE_SECRET=[tu_secret_de_google]
+GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI=https://api.viveiro.live/auth/v1/callback
+GOTRUE_COOKIE_DOMAIN=.viveiro.live
+GOTRUE_COOKIE_SAME_SITE=lax
+
+# ==============================================================================
+# NPM (Nginx Proxy Manager) - Proxmox 185.223.31.88
+# ==============================================================================
+# Proxy Host 1:
+#   Domain: api.viveiro.live
+#   Forward: http://localhost:8000 (Supabase Kong)
+#   SSL: Let's Encrypt
+#   Websockets: ON
+
+# Proxy Host 2:
+#   Domain: viveiro.live
+#   Forward: http://192.168.88.4:3000 (Next.js en tu PC - TEMPORAL)
+#   SSL: Let's Encrypt
+#   Websockets: ON
+#   NOTA: Actualmente SIN contenedor Docker, apuntando a localhost en desarrollo
+
+# ==============================================================================
+# REPOSITORIO GITHUB
+# ==============================================================================
+# Repositorio principal: https://github.com/landropunk/viveiro-weather
+# Branch principal: main
+
+# ==============================================================================
+# ESTADO ACTUAL DEL PROYECTO (2025-12-04)
+# ==============================================================================
+# 1. ✅ Supabase funcionando en VM Proxmox (185.223.31.88)
+# 2. ✅ API Backend disponible en https://api.viveiro.live
+# 3. ❌ Frontend viveiro.live SIN contenedor (eliminado 2025-12-04)
+# 4. ✅ Proyecto local completamente funcional con:
+#    - Sistema de cookies RGPD completo
+#    - Autenticación Supabase
+#    - Datos históricos MeteoGalicia funcionando
+#    - Datos en tiempo real de estaciones
+#    - Gráficos de comparación
+# 5. ✅ Desarrollo activo en localhost:3000
+
+# ==============================================================================
+# ÚLTIMOS COMMITS IMPORTANTES
+# ==============================================================================
+# ec7dce3 - refactor: Limpieza completa del proyecto para producción
+# 384b58f - feat: Configuración de despliegue Docker con seguridad mejorada
+# d35f557 - fix: Actualizar librería de datos históricos para nuevo formato API MeteoGalicia 2024
+# c5e2e55 - feat: Implementar sistema completo de gestión de cookies RGPD
+# 94d7d94 - chore: Limpieza completa de dependencias y archivos obsoletos
+
+# ==============================================================================
+# FUNCIONALIDADES IMPLEMENTADAS
+# ==============================================================================
+# ✅ Autenticación con Supabase (email/password + OAuth Google)
+# ✅ Dashboard protegido con rutas privadas
+# ✅ Datos meteorológicos en tiempo real (API MeteoGalicia V5)
+# ✅ Datos históricos horarios con formulario interactivo
+# ✅ Gráficos de comparación entre estaciones (Chart.js)
+# ✅ Sistema de cookies RGPD completo
+# ✅ Mapa interactivo de estaciones (Google Maps)
+# ✅ Modo oscuro/claro
+# ✅ Responsive design completo
+
+# ==============================================================================
+# PENDIENTE PARA PRODUCCIÓN
+# ==============================================================================
+# 1. Crear Dockerfile y docker-compose.yml para el frontend
+# 2. Configurar variables de entorno de producción (.env.production)
+# 3. Build y despliegue del contenedor en el servidor
+# 4. Actualizar NPM para que viveiro.live apunte al nuevo contenedor
+# 5. Configurar OAuth de Google con URLs de producción
+# 6. Crear páginas de Política de Privacidad y Política de Cookies
+
+# ==============================================================================
+# NOTAS DE DESARROLLO
+# ==============================================================================
+# - API MeteoGalicia: Datos históricos limitados a 12 horas por consulta
+# - Estaciones Viveiro: 10104 (Penedo do Galo 545m), 10162 (Borreiros 59m)
+# - Cookies RGPD: Guardadas en localStorage con versión 1.0
+# - Chart.js configurado para gráficos de series temporales
+
+# ==============================================================================
+# COMANDOS ÚTILES
+# ==============================================================================
+# Desarrollo local:
+#   pnpm dev                    # Iniciar servidor desarrollo
+#   pnpm build                  # Build de producción
+#   pnpm start                  # Servidor producción local
+
+# Docker (servidor):
+#   docker ps                   # Ver contenedores activos
+#   docker logs -f [container]  # Ver logs en tiempo real
+#   docker compose up -d        # Levantar stack
+#   docker compose down         # Detener stack
+
+# Supabase (servidor):
+#   cd /root/supabase-viveirolive/docker
+#   docker compose ps           # Estado de servicios
+#   docker compose restart auth # Reiniciar servicio auth

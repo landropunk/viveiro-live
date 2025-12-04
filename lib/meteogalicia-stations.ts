@@ -1,6 +1,6 @@
 /**
  * Servicio para integración con estaciones meteorológicas de MeteoGalicia
- * Endpoints de observación RSS/JSON
+ * API V5 - Endpoints de observación
  */
 
 import type {
@@ -12,7 +12,7 @@ import type {
 } from '@/types/weather';
 import { msToKmh } from './utils';
 
-const METEOGALICIA_RSS_BASE = 'https://servizos.meteogalicia.gal/rss/observacion';
+const METEOGALICIA_OBS_BASE = 'https://servizos.meteogalicia.gal/mgrss/observacion';
 
 /**
  * Estaciones meteorológicas de Viveiro
@@ -121,48 +121,61 @@ export const MAIN_PARAMETERS = [
  */
 export async function getViveiroStationsData(): Promise<StationObservation[]> {
   try {
-    const url = `${METEOGALICIA_RSS_BASE}/ultimos10minEstacionsMeteo.action`;
+    // Obtener datos de cada estación individualmente
+    const stationPromises = VIVEIRO_STATIONS.map(station => {
+      const url = `${METEOGALICIA_OBS_BASE}/ultimos10minEstacionsMeteo.action?idEst=${station.id}`;
+      console.log(`📡 Llamando API observaciones para estación ${station.name}:`, url);
 
-    console.log('📡 Llamando a API de observaciones MeteoGalicia:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      cache: 'no-store', // Sin caché - datos frescos en cada request
+      return fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+        cache: 'no-store',
+      });
     });
 
-    if (!response.ok) {
-      throw new Error(`Error API observaciones: ${response.status}`);
+    const responses = await Promise.all(stationPromises);
+
+    // Verificar respuestas
+    const failedResponse = responses.find(r => !r.ok);
+    if (failedResponse) {
+      throw new Error(`Error API observaciones: ${failedResponse.status}`);
     }
 
-    const data: StationObservationsResponse = await response.json();
+    const dataArrays = await Promise.all(responses.map(r => r.json()));
 
-    // Filtrar solo las estaciones de Viveiro
-    const viveiroStationIds = VIVEIRO_STATIONS.map(s => s.id);
-    const viveiroData = data.listUltimos10min.filter(station =>
-      viveiroStationIds.includes(station.idEstacion)
-    );
+    // Transformar datos al formato de la aplicación
+    const observations: StationObservation[] = [];
+
+    for (let i = 0; i < dataArrays.length; i++) {
+      const stationData = dataArrays[i];
+      const station = VIVEIRO_STATIONS[i];
+
+      if (stationData && stationData.listUltimos10min && stationData.listUltimos10min.length > 0) {
+        const latestReading = stationData.listUltimos10min[0];
+
+        observations.push({
+          stationId: station.id,
+          stationName: station.name,
+          timestamp: latestReading.instanteLecturaUTC,
+          measurements: latestReading.listaMedidas.map((medida: any) => ({
+            parameterCode: medida.codigoParametro,
+            parameterName: PARAMETER_NAMES[medida.codigoParametro] || medida.nomeParametro,
+            unit: medida.unidade,
+            value: medida.valor,
+            validationCode: medida.lnCodigoValidacion,
+          })),
+        });
+      }
+    }
 
     console.log('✅ Datos de estaciones recibidos:', {
-      total: viveiroData.length,
-      stations: viveiroData.map(s => `${s.estacion} (${s.idEstacion})`),
+      total: observations.length,
+      stations: observations.map(s => `${s.stationName} (${s.stationId})`),
     });
 
-    // Transformar a formato de la aplicación
-    return viveiroData.map(station => ({
-      stationId: station.idEstacion,
-      stationName: station.estacion.trim(),
-      timestamp: station.instanteLecturaUTC,
-      measurements: station.listaMedidas.map(medida => ({
-        parameterCode: medida.codigoParametro,
-        parameterName: PARAMETER_NAMES[medida.codigoParametro] || medida.nomeParametro,
-        unit: medida.unidade,
-        value: medida.valor,
-        validationCode: medida.lnCodigoValidacion,
-      })),
-    }));
+    return observations;
   } catch (error) {
     console.error('❌ Error obteniendo datos de estaciones:', error);
     throw error;

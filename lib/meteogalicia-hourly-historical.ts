@@ -38,22 +38,24 @@ export interface HourlyStationData {
 }
 
 /**
- * Respuesta de la API de datos horarios históricos
+ * Respuesta de la API de datos horarios históricos (formato real 2024)
  */
 interface HourlyHistoricalResponse {
-  idEstacion: number;
-  nombreEstacion: string;
-  lat: number;
-  lon: number;
-  parametros: {
-    codigo: string;
-    nombre: string;
-    unidade: string;
-    valores: Array<{
-      fecha: string;
-      valor: number | string;
+  dataIni: string;
+  listHorarios: Array<{
+    estacion: string;
+    idEstacion: number;
+    listaInstantes: Array<{
+      instanteLecturaUTC: string;
+      listaMedidas: Array<{
+        codigoParametro: string;
+        lnCodigoValidacion: number;
+        nomeParametro: string;
+        unidade: string;
+        valor: number;
+      }>;
     }>;
-  }[];
+  }>;
 }
 
 /**
@@ -96,12 +98,18 @@ export async function getHourlyHistoricalData(
 
     const data: HourlyHistoricalResponse = await response.json();
 
+    if (!data.listHorarios || data.listHorarios.length === 0) {
+      console.warn('⚠️ API históricos retornó datos vacíos');
+      return [];
+    }
+
+    const stationData = data.listHorarios[0];
     console.log('✅ Datos horarios recibidos:', {
-      estacion: data.nombreEstacion,
-      parametros: data.parametros?.length,
+      estacion: stationData.estacion,
+      instantes: stationData.listaInstantes?.length,
     });
 
-    return transformHourlyData(data);
+    return transformHourlyData(stationData);
   } catch (error) {
     if (error instanceof Error && error.name === 'TimeoutError') {
       console.warn('⚠️ Timeout obteniendo datos horarios históricos - Retornando datos vacíos');
@@ -148,24 +156,28 @@ export async function getViveiroHourlyHistoricalData(
 
 /**
  * Obtiene datos de las últimas N horas desde ahora
+ * NOTA: MeteoGalicia solo permite datos históricos con cierto retraso (varios meses)
+ * Por eso usamos datos de hace ~2 meses como demostración
  * @param numHours Número de horas hacia atrás
  * @returns Map con datos por estación
  */
 export async function getLastHoursData(numHours: number = 24): Promise<Map<number, HourlyStationData[]>> {
-  // Calcular fecha y hora inicial (N horas hacia atrás)
+  // WORKAROUND: La API solo acepta fechas pasadas (con varios meses de retraso)
+  // Usamos datos de hace 2 meses como ejemplo
   const now = new Date();
-  const startDate = new Date(now.getTime() - numHours * 60 * 60 * 1000);
+  const twoMonthsAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000); // 60 días atrás
+  const startDate = new Date(twoMonthsAgo.getTime() - numHours * 60 * 60 * 1000);
 
   // Formatear a DD/MM/YYYY HH:MM
   const day = String(startDate.getDate()).padStart(2, '0');
   const month = String(startDate.getMonth() + 1).padStart(2, '0');
   const year = startDate.getFullYear();
   const hours = String(startDate.getHours()).padStart(2, '0');
-  const minutes = String(startDate.getMinutes()).padStart(2, '0');
+  const minutes = '00'; // Redondear a horas exactas
 
   const startDateTime = `${day}/${month}/${year} ${hours}:${minutes}`;
 
-  console.log(`📅 Obteniendo últimas ${numHours} horas desde ${startDateTime}`);
+  console.log(`📅 Obteniendo datos históricos (${numHours}h desde ${startDateTime})`);
 
   return await getViveiroHourlyHistoricalData(startDateTime, numHours);
 }
@@ -173,32 +185,23 @@ export async function getLastHoursData(numHours: number = 24): Promise<Map<numbe
 /**
  * Transforma los datos de la API al formato de la aplicación
  */
-function transformHourlyData(apiData: HourlyHistoricalResponse): HourlyStationData[] {
-  if (!apiData.parametros || !Array.isArray(apiData.parametros)) {
+function transformHourlyData(stationData: HourlyHistoricalResponse['listHorarios'][0]): HourlyStationData[] {
+  if (!stationData.listaInstantes || !Array.isArray(stationData.listaInstantes)) {
     return [];
   }
 
-  // Crear un mapa de timestamps
-  const timestampMap = new Map<string, HourlyStationData>();
+  // Transformar cada instante en un punto de datos
+  const hourlyData: HourlyStationData[] = stationData.listaInstantes.map((instante) => {
+    const dataPoint: HourlyStationData = {
+      timestamp: instante.instanteLecturaUTC,
+    };
 
-  // Procesar cada parámetro
-  apiData.parametros.forEach((param) => {
-    if (!param.valores || !Array.isArray(param.valores)) return;
+    // Procesar cada medida
+    instante.listaMedidas.forEach((medida) => {
+      const value = medida.valor;
+      const code = medida.codigoParametro;
 
-    param.valores.forEach((valor) => {
-      const timestamp = valor.fecha;
-
-      // Obtener o crear punto de datos para este timestamp
-      let dataPoint = timestampMap.get(timestamp);
-      if (!dataPoint) {
-        dataPoint = { timestamp };
-        timestampMap.set(timestamp, dataPoint);
-      }
-
-      // Mapear parámetros a propiedades
-      const value = typeof valor.valor === 'string' ? parseFloat(valor.valor) : valor.valor;
-
-      switch (param.codigo) {
+      switch (code) {
         case 'TA_AVG_1.5m':
         case 'TA_AVG_2m':
           dataPoint.temperature = value;
@@ -213,8 +216,8 @@ function transformHourlyData(apiData: HourlyHistoricalResponse): HourlyStationDa
           break;
         case 'VV_AVG_10m':
         case 'VV_AVG_2m':
-          // Convertir de m/s a km/h si es necesario
-          dataPoint.windSpeed = param.unidade === 'm/s' ? msToKmh(value) : value;
+          // Convertir de m/s a km/h
+          dataPoint.windSpeed = medida.unidade === 'm/s' ? msToKmh(value) : value;
           break;
         case 'DV_AVG_10m':
         case 'DV_AVG_2m':
@@ -222,6 +225,7 @@ function transformHourlyData(apiData: HourlyHistoricalResponse): HourlyStationDa
           break;
         case 'PA_AVG_1.5m':
         case 'PA_AVG_2m':
+        case 'PR_AVG_1.5m':
           dataPoint.pressure = value;
           break;
         case 'RS_AVG_1.5m':
@@ -230,13 +234,15 @@ function transformHourlyData(apiData: HourlyHistoricalResponse): HourlyStationDa
           break;
         default:
           // Guardar otros parámetros con su código original
-          dataPoint[param.codigo] = value;
+          dataPoint[code] = value;
       }
     });
+
+    return dataPoint;
   });
 
-  // Convertir el mapa a array y ordenar por timestamp
-  return Array.from(timestampMap.values()).sort((a, b) =>
+  // Ordenar por timestamp
+  return hourlyData.sort((a, b) =>
     new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
   );
 }
