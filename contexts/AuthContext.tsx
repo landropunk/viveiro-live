@@ -89,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       provider: 'google',
       options: {
         redirectTo: `${redirectUrl}/auth/callback`,
+        skipBrowserRedirect: false,
         queryParams: forceAccountSelection ? {
           prompt: 'select_account',
         } : undefined,
