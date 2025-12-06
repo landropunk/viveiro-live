@@ -20,5 +20,19 @@ export function createClient() {
   console.log('✅ Supabase client initialized')
   console.log('URL:', supabaseUrl)
 
-  return createBrowserClient(supabaseUrl, supabaseKey)
+  return createBrowserClient(supabaseUrl, supabaseKey, {
+    cookies: {
+      get(name: string) {
+        const cookies = document.cookie.split(';')
+        const cookie = cookies.find(c => c.trim().startsWith(`${name}=`))
+        return cookie?.split('=')[1]
+      },
+      set(name: string, value: string, options: any) {
+        document.cookie = `${name}=${value}; path=/; max-age=${options.maxAge}; SameSite=Lax; Secure`
+      },
+      remove(name: string, options: any) {
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`
+      },
+    },
+  })
 }
