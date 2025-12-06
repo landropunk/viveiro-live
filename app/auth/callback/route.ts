@@ -3,37 +3,18 @@
  * Supabase redirige aquí después de autenticación exitosa
  */
 
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
+
+  // Usar NEXT_PUBLIC_SITE_URL si está configurado, sino usar origin de la request
   const origin = process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin
 
   if (code) {
-    const cookieStore = await cookies()
-
-    // Crear cliente Supabase con manejo explícito de cookies
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            // Establecer todas las cookies sin try-catch para que fallen si hay error
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          },
-        },
-      }
-    )
-
+    const supabase = await createClient()
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (error) {
