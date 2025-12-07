@@ -3,8 +3,7 @@
  * Supabase redirige aquí después de autenticación exitosa
  */
 
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -15,29 +14,8 @@ export async function GET(request: Request) {
   const origin = process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin
 
   if (code) {
-    // IMPORTANTE: OAuth callback DEBE usar URL pública para acceder a cookies PKCE
-    // No usar SUPABASE_URL_INTERNAL aquí, siempre usar la URL pública
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              )
-            } catch {
-              // Ignore errors from Server Components
-            }
-          },
-        },
-      }
-    )
+    // Usar la misma función que el resto del server-side para consistencia
+    const supabase = await createClient()
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (error) {
