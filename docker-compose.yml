@@ -35,6 +35,8 @@ services:
       # Supabase - Conecta via HTTPS (NPM reverse proxy)
       NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      # Supabase - URL interna para comunicación server-side (red Docker)
+      SUPABASE_URL_INTERNAL: ${SUPABASE_URL_INTERNAL:-http://supabase-kong:8000}
       # Site URL
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
       # API Keys
@@ -63,7 +65,7 @@ networks:
 # - Este stack comparte red Docker con Supabase mediante "viveiro-network"
 # - Conexión CLIENT-SIDE (navegador): https://api.viveiro.live (NPM → Kong:8000)
 # - Conexión SERVER-SIDE (Next.js): http://supabase-kong:8000 (directo via Docker)
-# - Frontend accesible en: https://viveiro.live (NPM → 185.223.31.88:3000)
+# - Frontend accesible en: https://viveiro.live (NPM → servidor:3000)
 # - Ventajas:
 #   ✅ Comunicación interna optimizada (sin pasar por NPM)
 #   ✅ Mejor rendimiento para SSR
