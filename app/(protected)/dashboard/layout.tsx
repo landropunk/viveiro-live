@@ -7,6 +7,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useDashboardConfig } from '@/hooks/useDashboardConfig';
 
+// Force dynamic rendering for all dashboard pages
+export const dynamic = 'force-dynamic';
+
 type SectionLink = {
   id: string;
   name: string;
@@ -88,7 +91,7 @@ const baseSections: SectionLink[] = [
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
-  const { isAdmin, loading: isAdminLoading } = useIsAdmin();
+  const { isAdmin } = useIsAdmin();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { config, loading: configLoading } = useDashboardConfig();
 

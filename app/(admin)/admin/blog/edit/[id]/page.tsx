@@ -5,6 +5,9 @@ import { useParams } from 'next/navigation';
 import BlogPostForm from '@/components/admin/BlogPostForm';
 import { getBlogPostById, updateBlogPost, type BlogPost, type BlogPostInput } from '@/lib/admin/blog';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 export default function EditBlogPostPage() {
   const params = useParams();
   const id = params.id as string;

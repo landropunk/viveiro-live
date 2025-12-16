@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Cookie, Settings, X } from 'lucide-react';
+import { Cookie, Settings } from 'lucide-react';
 import { CookieSettings } from './CookieSettings';
 
 interface CookieBannerProps {

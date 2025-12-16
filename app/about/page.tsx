@@ -6,6 +6,9 @@ export const metadata = {
   description: "Conoce más sobre el proyecto Next.js Autonomía y sus tecnologías",
 };
 
+// Force dynamic rendering because Header uses client hooks
+export const dynamic = 'force-dynamic';
+
 export default function AboutPage() {
   return (
     <>

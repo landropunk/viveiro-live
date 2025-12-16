@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
@@ -9,7 +8,9 @@ import AnimatedSection from "@/components/AnimatedSection";
 import { useAuth } from "@/contexts/AuthContext";
 import type { BlogPost } from "@/lib/admin/blog";
 import { createClient } from "@/lib/supabase/client";
-import { useDashboardConfig } from "@/hooks/useDashboardConfig";
+
+// Force dynamic rendering for home page
+export const dynamic = 'force-dynamic';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -31,11 +32,10 @@ const itemVariants = {
 };
 
 export default function Home() {
-  const { user } = useAuth();
-  const { config: sectionsConfig, loading: loadingConfig } = useDashboardConfig();
+  const { user, loading: authLoading } = useAuth();
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
-  const [blogEnabled, setBlogEnabled] = useState(true);
+  const blogEnabled = true;
 
   useEffect(() => {
     const loadBlogPosts = async () => {
@@ -159,13 +159,13 @@ export default function Home() {
                 className="flex justify-center gap-4"
               >
                 <Link
-                  href="/auth/login"
+                  href="/auth/signin"
                   className="rounded-lg bg-blue-600 px-8 py-4 text-lg font-semibold text-white transition-all hover:scale-105 hover:bg-blue-700 hover:shadow-xl"
                 >
                   Iniciar Sesión
                 </Link>
                 <Link
-                  href="/auth/register"
+                  href="/auth/signup"
                   className="rounded-lg border border-gray-300 bg-white px-8 py-4 text-lg font-semibold text-gray-900 transition-all hover:scale-105 hover:bg-gray-50 hover:shadow-xl dark:border-gray-700 dark:bg-gray-950 dark:text-white dark:hover:bg-gray-900"
                 >
                   Registrarse
@@ -181,16 +181,16 @@ export default function Home() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
-              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+              className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(300px,384px))] justify-center"
             >
               {/* Meteorología */}
-              {sectionsConfig.meteo && (
-              <Link href={user ? "/dashboard/meteo" : "/auth/login"}>
+              {(!user || !authLoading) && (
+              <Link href={user ? "/dashboard/meteo" : "/auth/signin"}>
                 <motion.div
                   variants={itemVariants}
                   whileHover={{ scale: 1.05, y: -5 }}
                   transition={{ duration: 0.3 }}
-                  className="group cursor-pointer rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-blue-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950"
+                  className="group cursor-pointer rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-blue-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950 w-full max-w-sm"
                 >
                   <motion.div
                     className="mb-4 text-5xl"
@@ -214,13 +214,13 @@ export default function Home() {
               )}
 
               {/* Live/Play */}
-              {sectionsConfig.eventos && (
-              <Link href={user ? "/dashboard/eventos" : "/auth/login"}>
+              {(!user || !authLoading) && (
+              <Link href={user ? "/dashboard/eventos" : "/auth/signin"}>
                 <motion.div
                   variants={itemVariants}
                   whileHover={{ scale: 1.05, y: -5 }}
                   transition={{ duration: 0.3 }}
-                  className="group cursor-pointer rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-purple-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950"
+                  className="group cursor-pointer rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-purple-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950 w-full max-w-sm"
                 >
                   <motion.div
                     className="mb-4 text-5xl"
@@ -244,13 +244,13 @@ export default function Home() {
               )}
 
               {/* Webcams */}
-              {sectionsConfig.webcams && (
-              <Link href={user ? "/dashboard/webcams" : "/auth/login"}>
+              {(!user || !authLoading) && (
+              <Link href={user ? "/dashboard/webcams" : "/auth/signin"}>
                 <motion.div
                   variants={itemVariants}
                   whileHover={{ scale: 1.05, y: -5 }}
                   transition={{ duration: 0.3 }}
-                  className="group cursor-pointer rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-green-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950"
+                  className="group cursor-pointer rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-green-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950 w-full max-w-sm"
                 >
                   <motion.div
                     className="mb-4 text-5xl"
@@ -274,13 +274,13 @@ export default function Home() {
               )}
 
               {/* Históricos Horarios */}
-              {sectionsConfig.historicos && (
-              <Link href={user ? "/dashboard/historicos" : "/auth/login"}>
+              {(!user || !authLoading) && (
+              <Link href={user ? "/dashboard/historicos" : "/auth/signin"}>
                 <motion.div
                   variants={itemVariants}
                   whileHover={{ scale: 1.05, y: -5 }}
                   transition={{ duration: 0.3 }}
-                  className="group cursor-pointer rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-orange-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950"
+                  className="group cursor-pointer rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-orange-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950 w-full max-w-sm"
                 >
                   <motion.div
                     className="mb-4 text-5xl"
@@ -404,7 +404,7 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
                 <Link
-                  href="/auth/register"
+                  href="/auth/signup"
                   className="inline-flex rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 px-8 py-4 text-lg font-semibold text-white transition-all hover:scale-110 hover:from-blue-700 hover:to-cyan-700 hover:shadow-2xl"
                 >
                   Crear cuenta gratis

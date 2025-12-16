@@ -7,6 +7,7 @@
 import { useAuth } from '@/contexts/AuthContext'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { logger } from '@/lib/logger'
 
 export function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
   const { user } = useAuth()
@@ -31,7 +32,7 @@ export function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
           .single()
 
         if (error) {
-          console.error('[useIsAdmin] Error checking admin status:', error)
+          logger.error('[useIsAdmin] Error checking admin status:', error)
           setIsAdmin(false)
           setLoading(false)
           return
@@ -40,7 +41,7 @@ export function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
         setIsAdmin(data?.role === 'admin')
         setLoading(false)
       } catch (err) {
-        console.error('[useIsAdmin] Exception checking admin status:', err)
+        logger.error('[useIsAdmin] Exception checking admin status:', err)
         setIsAdmin(false)
         setLoading(false)
       }

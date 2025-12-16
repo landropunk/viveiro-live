@@ -6,6 +6,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import WebcamCard from '@/components/webcams/WebcamCard';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 type Webcam = {
   id: string;
   name: string;
@@ -28,7 +31,7 @@ export default function WebcamsPage() {
     if (authLoading) return;
 
     if (!user) {
-      router.push('/auth/login');
+      router.push('/auth/signin');
       return;
     }
 

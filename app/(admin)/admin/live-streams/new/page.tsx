@@ -6,6 +6,9 @@ import Link from 'next/link';
 import LiveStreamForm from '@/components/admin/LiveStreamForm';
 import type { LiveStreamInput } from '@/types/live-stream';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 export default function NewStreamPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 /**
  * Hook para obtener el nombre dinámico del sitio desde la base de datos
@@ -33,7 +34,7 @@ export function useSiteName() {
         setSiteName(data.value.value);
       }
     } catch (error) {
-      console.error('Error loading site name:', error);
+      logger.error('Error loading site name:', error);
       // Mantener valor por defecto en caso de error
     } finally {
       setLoading(false);

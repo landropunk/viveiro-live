@@ -9,7 +9,7 @@ import { getStationData, getStationInfo } from '@/lib/meteogalicia-stations';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Verificar autenticación
   const authResult = await requireAuth(request);
@@ -18,11 +18,12 @@ export async function GET(
   }
 
   const { user } = authResult;
+  const { id } = await params;
 
   try {
-    console.log(`User ${user.email} requested station ${params.id}`);
+    console.log(`User ${user.email} requested station ${id}`);
 
-    const stationId = parseInt(params.id, 10);
+    const stationId = parseInt(id, 10);
 
     if (isNaN(stationId)) {
       return NextResponse.json(
@@ -54,7 +55,7 @@ export async function GET(
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error(`Error en /api/protected/stations/${params.id}:`, error);
+    console.error(`Error en /api/protected/stations/${id}:`, error);
     return NextResponse.json(
       { error: 'Error obteniendo datos de la estación' },
       { status: 500 }

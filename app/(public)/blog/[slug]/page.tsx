@@ -1,18 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import { createClient } from '@/lib/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
 import type { BlogPost } from '@/lib/admin/blog';
+
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
 
 export default function BlogPostPage() {
   const params = useParams();
-  const router = useRouter();
-  const { user } = useAuth();
   const slug = params.slug as string;
 
   const [post, setPost] = useState<BlogPost | null>(null);

@@ -11,6 +11,7 @@ import type {
   StationComparisonData,
 } from '@/types/weather';
 import { msToKmh } from './utils';
+import { logger } from './logger';
 
 const METEOGALICIA_OBS_BASE = 'https://servizos.meteogalicia.gal/mgrss/observacion';
 
@@ -124,7 +125,7 @@ export async function getViveiroStationsData(): Promise<StationObservation[]> {
     // Obtener datos de cada estación individualmente
     const stationPromises = VIVEIRO_STATIONS.map(station => {
       const url = `${METEOGALICIA_OBS_BASE}/ultimos10minEstacionsMeteo.action?idEst=${station.id}`;
-      console.log(`📡 Llamando API observaciones para estación ${station.name}:`, url);
+      logger.debug(`📡 Llamando API observaciones para estación ${station.name}:`, url);
 
       return fetch(url, {
         method: 'GET',
@@ -170,14 +171,14 @@ export async function getViveiroStationsData(): Promise<StationObservation[]> {
       }
     }
 
-    console.log('✅ Datos de estaciones recibidos:', {
+    logger.debug('✅ Datos de estaciones recibidos:', {
       total: observations.length,
       stations: observations.map(s => `${s.stationName} (${s.stationId})`),
     });
 
     return observations;
   } catch (error) {
-    console.error('❌ Error obteniendo datos de estaciones:', error);
+    logger.error('❌ Error obteniendo datos de estaciones:', error);
     throw error;
   }
 }

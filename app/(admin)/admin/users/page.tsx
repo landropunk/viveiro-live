@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+// Force dynamic rendering for admin page
+export const dynamic = 'force-dynamic';
+
 interface UserProfile {
   id: string;
   email: string;

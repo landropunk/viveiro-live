@@ -17,6 +17,9 @@ import {
 } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 ChartJS.register(
   CategoryScale,
   LinearScale,

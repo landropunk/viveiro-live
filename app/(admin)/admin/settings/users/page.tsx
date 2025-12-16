@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 interface UserSetting {
   key: string;
   value: boolean | string;

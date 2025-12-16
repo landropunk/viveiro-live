@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 export default function CompleteProfilePage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -21,7 +24,7 @@ export default function CompleteProfilePage() {
 
   useEffect(() => {
     if (!user) {
-      router.push('/auth/login');
+      router.push('/auth/signin');
     }
   }, [user, router]);
 

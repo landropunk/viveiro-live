@@ -129,13 +129,13 @@ export default function Header({ showNavigation = true, showLogo = true }: Heade
           ) : (
             <>
               <Link
-                href="/auth/login"
+                href="/auth/signin"
                 className="hidden rounded-lg border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 transition-all hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-950 sm:inline-flex"
               >
                 Iniciar sesión
               </Link>
               <Link
-                href="/auth/register"
+                href="/auth/signup"
                 className="inline-flex rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-2 text-sm font-medium text-white transition-all hover:from-blue-700 hover:to-cyan-700 hover:shadow-lg"
               >
                 Registrarse

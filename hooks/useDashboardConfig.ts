@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 interface DashboardConfig {
   meteo: boolean;
@@ -33,7 +34,7 @@ export function useDashboardConfig() {
       const response = await fetch('/api/dashboard/config');
 
       if (!response.ok) {
-        console.warn('No se pudo cargar configuración, usando valores por defecto');
+        logger.warn('No se pudo cargar configuración, usando valores por defecto');
         setLoading(false);
         return;
       }
@@ -41,7 +42,7 @@ export function useDashboardConfig() {
       const data = await response.json();
       setConfig(data);
     } catch (error) {
-      console.error('Error cargando configuración del dashboard:', error);
+      logger.error('Error cargando configuración del dashboard:', error);
       // Mantener valores por defecto en caso de error
     } finally {
       setLoading(false);

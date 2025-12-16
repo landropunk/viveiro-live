@@ -13,6 +13,7 @@ import type {
   WeatherVariable,
 } from '@/types/weather';
 import { msToKmh } from './utils';
+import { logger } from './logger';
 
 const METEOGALICIA_API_BASE = 'https://servizos.meteogalicia.gal/mgrss/observacion';
 
@@ -95,7 +96,7 @@ export async function getStationHistoricalData(
     // Calcular número de horas según el período
     const numHoras = getHoursForPeriod(period);
 
-    console.log(`📊 Obteniendo datos históricos REALES: Estación ${stationId}, Período: ${period} (${numHoras}h)`);
+    logger.debug(`📊 Obteniendo datos históricos REALES: Estación ${stationId}, Período: ${period} (${numHoras}h)`);
 
     // Llamar al endpoint de MeteoGalicia
     const url = `${METEOGALICIA_API_BASE}/ultimosHorariosEstacions.action?idEst=${stationId}&numHoras=${numHoras}`;
@@ -115,11 +116,11 @@ export async function getStationHistoricalData(
     const stationData = data.listHorarios[0];
     const historicalData = transformToHistoricalData(stationData, period);
 
-    console.log(`✅ Datos históricos REALES obtenidos: ${historicalData.variables.length} variables, ${stationData.listaInstantes.length} lecturas`);
+    logger.debug(`✅ Datos históricos REALES obtenidos: ${historicalData.variables.length} variables, ${stationData.listaInstantes.length} lecturas`);
 
     return historicalData;
   } catch (error) {
-    console.error('❌ Error obteniendo datos históricos reales:', error);
+    logger.error('❌ Error obteniendo datos históricos reales:', error);
     throw error;
   }
 }
@@ -250,7 +251,7 @@ export async function getComparisonData(
       const data = await getStationHistoricalData(stationId, period);
       return { stationId, data };
     } catch (error) {
-      console.error(`Error obteniendo datos de estación ${stationId}:`, error);
+      logger.error(`Error obteniendo datos de estación ${stationId}:`, error);
       return null;
     }
   });

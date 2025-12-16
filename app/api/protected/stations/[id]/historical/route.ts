@@ -14,7 +14,7 @@ import type { HistoricalPeriod, WeatherVariable } from '@/types/weather';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Verificar autenticación
   const authResult = await requireAuth(request);
@@ -23,12 +23,13 @@ export async function GET(
   }
 
   const { user } = authResult;
+  const { id } = await params;
 
   try {
-    console.log(`User ${user.email} requested historical data for station ${params.id}`);
+    console.log(`User ${user.email} requested historical data for station ${id}`);
 
     // Parsear parámetros
-    const stationId = parseInt(params.id);
+    const stationId = parseInt(id);
     if (isNaN(stationId)) {
       return NextResponse.json(
         { error: 'ID de estación inválido' },

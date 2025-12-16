@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 interface UserProfile {
   id: string;
   email: string;

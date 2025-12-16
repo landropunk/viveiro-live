@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { getDashboardSectionsConfig } from '@/lib/admin/settings';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +17,7 @@ export async function GET() {
 
     return NextResponse.json(config);
   } catch (error) {
-    console.error('Error en GET /api/dashboard/config:', error);
+    logger.error('Error en GET /api/dashboard/config:', error);
 
     // Devolver configuración por defecto en caso de error
     return NextResponse.json({

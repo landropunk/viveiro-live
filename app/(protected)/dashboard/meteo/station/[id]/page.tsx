@@ -10,6 +10,9 @@ import { getStationInfo } from '@/lib/meteogalicia-stations';
 import type { StationObservation, WeatherVariable } from '@/types/weather';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 export default function StationDetailPage() {
   const router = useRouter();
   const params = useParams();
@@ -51,7 +54,7 @@ export default function StationDetailPage() {
 
       if (response.status === 401) {
         console.log('Unauthorized, redirecting to login');
-        router.push('/auth/login');
+        router.push('/auth/signin');
         return;
       }
 

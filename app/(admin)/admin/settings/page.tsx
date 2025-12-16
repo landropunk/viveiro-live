@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+// Force dynamic rendering for admin page
+export const dynamic = 'force-dynamic';
+
 interface AppSetting {
   id: string;
   key: string;
@@ -69,7 +72,7 @@ export default function SettingsPage() {
         throw new Error('Error al actualizar configuración');
       }
 
-      const result = await response.json();
+      await response.json();
 
       // Actualizar el estado local
       setSettings((prev) =>

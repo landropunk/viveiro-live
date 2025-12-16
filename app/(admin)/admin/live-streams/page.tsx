@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import type { LiveStream } from '@/types/live-stream';
 import { PLATFORM_INFO } from '@/types/live-stream';
 
+// Force dynamic rendering for admin page
+export const dynamic = 'force-dynamic';
+
 export default function LiveStreamsAdminPage() {
-  const router = useRouter();
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -120,7 +121,7 @@ export default function LiveStreamsAdminPage() {
       return <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">Inactivo</span>;
     }
 
-    const badges: Record<string, JSX.Element> = {
+    const badges: Record<string, React.ReactElement> = {
       live: <span className="rounded-full bg-red-100 px-2 py-1 text-xs text-red-800 dark:bg-red-900/30 dark:text-red-400">● En Vivo</span>,
       recorded: <span className="rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">Grabado</span>,
       scheduled: <span className="rounded-full bg-purple-100 px-2 py-1 text-xs text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">Programado</span>,

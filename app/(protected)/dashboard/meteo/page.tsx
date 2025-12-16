@@ -10,6 +10,9 @@ import UVWidget from '@/components/weather/UVWidget';
 import StationsView from '@/components/stations/StationsView';
 import type { CurrentWeatherData, WeatherForecast, DailyWeatherData } from '@/types/weather';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 type TabType = 'forecast' | 'stations';
 
 export default function DashboardPage() {
@@ -42,7 +45,7 @@ export default function DashboardPage() {
 
         if (currentResponse.status === 401) {
           console.log('Unauthorized, redirecting to login');
-          router.push('/auth/login');
+          router.push('/auth/signin');
           return;
         }
 
@@ -104,7 +107,7 @@ export default function DashboardPage() {
     if (authLoading) return;
 
     if (!user) {
-      router.push('/auth/login');
+      router.push('/auth/signin');
       return;
     }
 

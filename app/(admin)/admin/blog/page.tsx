@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getAllBlogPosts, deleteBlogPost, type BlogPost } from '@/lib/admin/blog';
 
+// Force dynamic rendering for admin page
+export const dynamic = 'force-dynamic';
+
 export default function BlogListPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);

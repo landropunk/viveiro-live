@@ -12,6 +12,7 @@ import type {
   DailyWeatherData
 } from '@/types/weather';
 import { msToKmh, kmhToMs } from './utils';
+import { logger } from './logger';
 
 const METEOGALICIA_API_BASE = 'https://servizos.meteogalicia.gal/apiv5';
 const METEOGALICIA_RSS_BASE = 'https://servizos.meteogalicia.gal/rss/predicion';
@@ -33,7 +34,7 @@ export async function getViveiroWeatherForecast(): Promise<WeatherForecast> {
     const API_KEY = process.env.METEOGALICIA_API_KEY || '';
 
     if (!API_KEY) {
-      console.warn('⚠️ METEOGALICIA_API_KEY no está configurada');
+      logger.warn('⚠️ METEOGALICIA_API_KEY no está configurada');
     }
 
     // Endpoint para predicción por coordenadas - incluir relative_humidity
@@ -42,7 +43,7 @@ export async function getViveiroWeatherForecast(): Promise<WeatherForecast> {
     url.searchParams.append('variables', 'temperature,precipitation_amount,wind,sky_state,relative_humidity');
     url.searchParams.append('API_KEY', API_KEY);
 
-    console.log('📡 Llamando a MeteoGalicia API V5:', url.toString().replace(API_KEY, 'XXXXX'));
+    logger.debug('📡 Llamando a MeteoGalicia API V5:', url.toString().replace(API_KEY, 'XXXXX'));
 
     const response = await fetch(url.toString(), {
       method: 'GET',
@@ -54,23 +55,23 @@ export async function getViveiroWeatherForecast(): Promise<WeatherForecast> {
       signal: AbortSignal.timeout(15000),
     });
 
-    console.log('📥 Respuesta API V5:', response.status, response.statusText);
+    logger.debug('📥 Respuesta API V5:', response.status, response.statusText);
 
     if (!response.ok) {
-      console.warn(`⚠️ Error API MeteoGalicia: ${response.status} ${response.statusText} - Usando datos fallback`);
+      logger.warn(`⚠️ Error API MeteoGalicia: ${response.status} ${response.statusText} - Usando datos fallback`);
       return getFallbackWeatherData();
     }
 
     // Verificar que la respuesta es JSON antes de parsear
     const contentType = response.headers.get('content-type');
     if (!contentType?.includes('application/json')) {
-      console.warn(`⚠️ API MeteoGalicia retornó ${contentType} en lugar de JSON - Usando datos fallback`);
+      logger.warn(`⚠️ API MeteoGalicia retornó ${contentType} en lugar de JSON - Usando datos fallback`);
       return getFallbackWeatherData();
     }
 
     const data = await response.json();
 
-    console.log('✅ Datos recibidos de API V5:', {
+    logger.debug('✅ Datos recibidos de API V5:', {
       features: data.features?.length,
       days: data.features?.[0]?.properties?.days?.length,
     });
@@ -78,11 +79,11 @@ export async function getViveiroWeatherForecast(): Promise<WeatherForecast> {
     return transformMeteoGaliciaData(data);
   } catch (error) {
     if (error instanceof Error && error.name === 'TimeoutError') {
-      console.warn('⚠️ Timeout obteniendo datos de MeteoGalicia - Usando datos fallback');
+      logger.warn('⚠️ Timeout obteniendo datos de MeteoGalicia - Usando datos fallback');
     } else if (error instanceof SyntaxError) {
-      console.warn('⚠️ Error parseando JSON de MeteoGalicia (probablemente HTML) - Usando datos fallback');
+      logger.warn('⚠️ Error parseando JSON de MeteoGalicia (probablemente HTML) - Usando datos fallback');
     } else {
-      console.error('❌ Error obteniendo datos de MeteoGalicia:', error);
+      logger.error('❌ Error obteniendo datos de MeteoGalicia:', error);
     }
     return getFallbackWeatherData();
   }
@@ -165,7 +166,7 @@ export async function getCurrentWeather(): Promise<CurrentWeatherData | null> {
     const currentData = forecast.data[0];
 
     if (!currentData) {
-      console.warn('⚠️ No hay datos de pronóstico disponibles - API de MeteoGalicia no responde');
+      logger.warn('⚠️ No hay datos de pronóstico disponibles - API de MeteoGalicia no responde');
       return null;
     }
 
@@ -187,7 +188,7 @@ export async function getCurrentWeather(): Promise<CurrentWeatherData | null> {
       timestamp: currentData.timestamp,
     };
   } catch (error) {
-    console.error('Error obteniendo clima actual:', error);
+    logger.error('Error obteniendo clima actual:', error);
     return null;
   }
 }
@@ -269,7 +270,7 @@ function transformMeteoGaliciaData(apiData: any): WeatherForecast {
                     }
                   } catch (err) {
                     // Si hay error parseando una fecha, la ignoramos
-                    console.warn('Error parseando timestamp:', valueObj.timeInstant, err);
+                    logger.warn('Error parseando timestamp:', valueObj.timeInstant, err);
                   }
                 });
               });
@@ -282,16 +283,16 @@ function transformMeteoGaliciaData(apiData: any): WeatherForecast {
       });
     }
   } catch (error) {
-    console.error('Error transformando datos de MeteoGalicia:', error);
+    logger.error('Error transformando datos de MeteoGalicia:', error);
   }
 
   // Si no hay datos válidos de la API, lanzar error
   if (weatherData.length === 0) {
-    console.error('❌ No se obtuvieron datos válidos de la API de MeteoGalicia');
+    logger.error('❌ No se obtuvieron datos válidos de la API de MeteoGalicia');
     throw new Error('No se pudieron obtener datos meteorológicos del servicio de MeteoGalicia. Por favor, inténtelo de nuevo más tarde.');
   }
 
-  console.log('✅ Datos transformados correctamente:', {
+  logger.debug('✅ Datos transformados correctamente:', {
     totalPoints: weatherData.length,
     firstTimestamp: weatherData[0]?.timestamp,
     lastTimestamp: weatherData[weatherData.length - 1]?.timestamp,
@@ -410,7 +411,7 @@ export async function getMunicipalityForecast(): Promise<DailyWeatherData[]> {
   try {
     const url = `${METEOGALICIA_RSS_BASE}/jsonPredConcellos.action?idConc=${VIVEIRO_LOCATION.id}`;
 
-    console.log('📡 Llamando a MeteoGalicia RSS/JSON:', url);
+    logger.debug('📡 Llamando a MeteoGalicia RSS/JSON:', url);
 
     const response = await fetch(url, {
       method: 'GET',
@@ -426,7 +427,7 @@ export async function getMunicipalityForecast(): Promise<DailyWeatherData[]> {
 
     const data: MunicipalityForecastResponse = await response.json();
 
-    console.log('✅ Datos municipales recibidos:', {
+    logger.debug('✅ Datos municipales recibidos:', {
       municipio: data.predConcello.nome,
       dias: data.predConcello.listaPredDiaConcello.length,
     });
@@ -455,7 +456,7 @@ export async function getMunicipalityForecast(): Promise<DailyWeatherData[]> {
       },
     }));
   } catch (error) {
-    console.error('❌ Error obteniendo datos municipales:', error);
+    logger.error('❌ Error obteniendo datos municipales:', error);
     throw error;
   }
 }

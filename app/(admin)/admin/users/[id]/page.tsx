@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 interface UserProfile {
   id: string;
   email: string;
@@ -21,7 +24,7 @@ interface UserProfile {
   updated_at: string;
 }
 
-export default function EditUserPage({ params }: { params: { id: string } }) {
+function EditUserContent({ id }: { id: string }) {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,7 +47,8 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     loadUser();
-  }, [params.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const loadUser = async () => {
     try {
@@ -62,7 +66,7 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
       }
 
       const users: UserProfile[] = await response.json();
-      const foundUser = users.find(u => u.id === params.id);
+      const foundUser = users.find(u => u.id === id);
 
       if (!foundUser) {
         setError('Usuario no encontrado');
@@ -103,7 +107,7 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: params.id,
+          userId: id,
           ...formData,
         }),
       });
@@ -400,4 +404,9 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
       </div>
     </div>
   );
+}
+
+export default async function EditUserPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <EditUserContent id={id} />;
 }

@@ -7,6 +7,9 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useDashboardConfig } from '@/hooks/useDashboardConfig';
 import Link from 'next/link';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 type SectionType = {
   id: string;
   name: string;
@@ -97,7 +100,7 @@ export default function DashboardPage() {
     if (authLoading) return;
 
     if (!user) {
-      router.push('/auth/login');
+      router.push('/auth/signin');
       return;
     }
   }, [user, authLoading, router]);

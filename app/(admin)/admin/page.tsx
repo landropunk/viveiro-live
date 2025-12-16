@@ -5,6 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 type AdminCard = {
   title: string;
   description: string;

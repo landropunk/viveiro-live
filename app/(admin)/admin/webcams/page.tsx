@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 type Webcam = {
   id: string;
   name: string;
@@ -43,7 +46,7 @@ export default function AdminWebcamsPage() {
   useEffect(() => {
     if (authLoading || adminLoading) return; // Esperar a que termine de verificar admin
     if (!user) {
-      router.push('/auth/login');
+      router.push('/auth/signin');
       return;
     }
     if (!isAdmin) {

@@ -3,6 +3,9 @@
 import BlogPostForm from '@/components/admin/BlogPostForm';
 import { createBlogPost, type BlogPostInput } from '@/lib/admin/blog';
 
+// Force dynamic rendering for client component page
+export const dynamic = 'force-dynamic';
+
 export default function NewBlogPostPage() {
   const handleSubmit = async (data: BlogPostInput) => {
     await createBlogPost(data);

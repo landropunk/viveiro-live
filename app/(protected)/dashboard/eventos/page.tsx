@@ -1,12 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import type { LiveStream } from '@/types/live-stream';
 import { PLATFORM_INFO, getEmbedUrl } from '@/types/live-stream';
+
+// Force dynamic rendering for dashboard page
+export const dynamic = 'force-dynamic';
 
 export default function EventosPage() {
   const router = useRouter();
@@ -20,7 +23,7 @@ export default function EventosPage() {
     if (authLoading) return;
 
     if (!user) {
-      router.push('/auth/login');
+      router.push('/auth/signin');
       return;
     }
 
@@ -63,7 +66,7 @@ export default function EventosPage() {
   });
 
   const getStatusBadge = (stream: LiveStream) => {
-    const badges: Record<string, JSX.Element> = {
+    const badges: Record<string, React.ReactElement> = {
       live: (
         <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-400">
           <span className="h-2 w-2 animate-pulse rounded-full bg-red-600"></span>

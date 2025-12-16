@@ -50,7 +50,7 @@ export async function updateSession(request: NextRequest) {
   // Proteger rutas que requieren autenticación
   if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
+    url.pathname = '/auth/signin'
     return NextResponse.redirect(url)
   }
 
@@ -77,7 +77,7 @@ export async function updateSession(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/admin')) {
     if (!user) {
       const url = request.nextUrl.clone()
-      url.pathname = '/auth/login'
+      url.pathname = '/auth/signin'
       return NextResponse.redirect(url)
     }
 
@@ -98,7 +98,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Redirigir usuarios autenticados de páginas de auth
-  if (user && (request.nextUrl.pathname.startsWith('/auth/login') || request.nextUrl.pathname.startsWith('/auth/register'))) {
+  if (user && (request.nextUrl.pathname.startsWith('/auth/signin') || request.nextUrl.pathname.startsWith('/auth/signup'))) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
