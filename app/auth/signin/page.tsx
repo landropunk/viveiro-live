@@ -11,11 +11,9 @@ export const dynamic = 'force-dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function SignInPage() {
   const { signInWithGoogle, signInWithEmail } = useAuth();
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -32,7 +30,8 @@ export default function SignInPage() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push('/dashboard');
+      // Forzar recarga para asegurar que las cookies se propaguen
+      window.location.href = '/dashboard';
     }
   };
 
