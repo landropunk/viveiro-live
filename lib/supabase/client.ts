@@ -23,3 +23,4 @@ export function createClient() {
   // Dejar que Supabase maneje las cookies automáticamente
   // El cliente SSR de Supabase ya tiene gestión de cookies optimizada
   return createBrowserClient(supabaseUrl, supabaseKey)
+}
