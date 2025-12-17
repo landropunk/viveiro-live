@@ -20,7 +20,7 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error('Error en OAuth callback:', error)
-      return NextResponse.redirect(`${origin}/auth/login?error=${error.message}`)
+      return NextResponse.redirect(`${origin}/auth/signin?error=${error.message}`)
     }
 
     // Si el login fue exitoso, verificar/crear perfil de usuario
