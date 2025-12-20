@@ -27,15 +27,15 @@ export async function GET(request: Request) {
     // Si el login fue exitoso, verificar/crear perfil de usuario
     if (data?.user) {
       console.log(`✅ Usuario autenticado: ${data.user.email}`)
+      console.log(`📊 Provider: ${data.user.app_metadata?.provider}`)
 
-      // Detectar si es OAuth (Google, etc.) o verificación de email
-      const isOAuthProvider = data.user.app_metadata?.provider !== 'email'
-      const isEmailVerification = !isOAuthProvider && !data.user.email_confirmed_at
+      // Detectar si es OAuth (Google) o email/password
+      const isOAuthProvider = data.user.app_metadata?.provider === 'google'
 
       // Verificar si el usuario ya tiene perfil
       const { data: existingProfile } = await supabase
         .from('user_profiles')
-        .select('id, full_name')
+        .select('id, full_name, birth_date, city')
         .eq('id', data.user.id)
         .single()
 
@@ -60,20 +60,27 @@ export async function GET(request: Request) {
         // Usuario nuevo sin perfil = verificación de email
         console.log('📧 Verificación de email completada (usuario nuevo)')
         return NextResponse.redirect(`${origin}/auth/verified`)
-      } else {
-        console.log(`✓ Usuario ${data.user.email} ya tiene perfil`)
-
-        // Si no tiene full_name, es un usuario que necesita completar perfil
-        if (!existingProfile.full_name) {
-          console.log('📧 Verificación de email completada (perfil incompleto)')
-          return NextResponse.redirect(`${origin}/auth/verified`)
-        }
       }
 
-      // Si es verificación de email explícita (parámetro type)
-      if (type === 'signup' || type === 'email') {
-        console.log('📧 Verificación de email completada (tipo explícito)')
+      // Verificar si el perfil está completo
+      const isProfileComplete = !!(
+        existingProfile.full_name &&
+        existingProfile.birth_date &&
+        existingProfile.city
+      )
+
+      console.log(`📋 Perfil completo: ${isProfileComplete}`)
+
+      // Si NO es login de Google Y el perfil NO está completo
+      if (!isOAuthProvider && !isProfileComplete) {
+        console.log('📧 Verificación de email - redirigiendo a página de éxito')
         return NextResponse.redirect(`${origin}/auth/verified`)
+      }
+
+      // Si es OAuth de Google con perfil incompleto, ir directo a completar perfil
+      if (isOAuthProvider && !isProfileComplete) {
+        console.log('🔐 Login Google - redirigiendo a completar perfil')
+        return NextResponse.redirect(`${origin}/complete-profile`)
       }
     }
   }
