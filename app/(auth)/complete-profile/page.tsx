@@ -17,7 +17,7 @@ export default function CompleteProfilePage() {
     full_name: '',
     city: 'Viveiro',
     postal_code: '',
-    birth_date: '',
+    birth_year: '',
   });
 
   const [showPostalCode, setShowPostalCode] = useState(false);
@@ -50,8 +50,26 @@ export default function CompleteProfilePage() {
       return;
     }
 
-    if (!formData.birth_date) {
-      setError('La fecha de nacimiento es obligatoria');
+    if (!formData.birth_year) {
+      setError('El año de nacimiento es obligatorio');
+      setLoading(false);
+      return;
+    }
+
+    // Validar que sea un año válido
+    const yearNum = parseInt(formData.birth_year);
+    const currentYear = new Date().getFullYear();
+
+    if (isNaN(yearNum) || yearNum < 1900 || yearNum > currentYear) {
+      setError('Por favor, introduce un año de nacimiento válido');
+      setLoading(false);
+      return;
+    }
+
+    // Validar edad mínima de 12 años
+    const age = currentYear - yearNum;
+    if (age < 12) {
+      setError('Debes tener al menos 12 años para registrarte en esta aplicación');
       setLoading(false);
       return;
     }
@@ -154,20 +172,26 @@ export default function CompleteProfilePage() {
               </select>
             </div>
 
-            {/* Fecha de nacimiento */}
+            {/* Año de nacimiento */}
             <div>
-              <label htmlFor="birth_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Fecha de nacimiento <span className="text-red-500">*</span>
+              <label htmlFor="birth_year" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Año de nacimiento <span className="text-red-500">*</span>
               </label>
               <input
-                id="birth_date"
-                name="birth_date"
-                type="date"
+                id="birth_year"
+                name="birth_year"
+                type="number"
                 required
-                value={formData.birth_date}
-                onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
+                min="1900"
+                max={new Date().getFullYear()}
+                value={formData.birth_year}
+                onChange={(e) => setFormData({ ...formData, birth_year: e.target.value })}
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:text-sm"
+                placeholder="Ej: 1990"
               />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Debes tener al menos 12 años para registrarte
+              </p>
             </div>
 
             {/* Código Postal (condicional) */}

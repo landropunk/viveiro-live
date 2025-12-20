@@ -35,7 +35,7 @@ export async function GET(request: Request) {
       // Verificar si el usuario ya tiene perfil
       const { data: existingProfile } = await supabase
         .from('user_profiles')
-        .select('id, full_name, birth_date, city')
+        .select('id, full_name, birth_year, city')
         .eq('id', data.user.id)
         .single()
 
@@ -65,7 +65,7 @@ export async function GET(request: Request) {
       // Verificar si el perfil está completo
       const isProfileComplete = !!(
         existingProfile.full_name &&
-        existingProfile.birth_date &&
+        existingProfile.birth_year &&
         existingProfile.city
       )
 

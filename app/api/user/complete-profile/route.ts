@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
     // Obtener datos del formulario
     const body = await request.json()
-    const { full_name, city, postal_code, birth_date } = body
+    const { full_name, city, postal_code, birth_year } = body
 
     // Validaciones
     if (!full_name || !full_name.trim()) {
@@ -27,9 +27,29 @@ export async function POST(request: Request) {
       )
     }
 
-    if (!birth_date) {
+    if (!birth_year) {
       return NextResponse.json(
-        { error: 'La fecha de nacimiento es obligatoria' },
+        { error: 'El año de nacimiento es obligatorio' },
+        { status: 400 }
+      )
+    }
+
+    // Validar año de nacimiento
+    const yearNum = parseInt(birth_year)
+    const currentYear = new Date().getFullYear()
+
+    if (isNaN(yearNum) || yearNum < 1900 || yearNum > currentYear) {
+      return NextResponse.json(
+        { error: 'Año de nacimiento inválido' },
+        { status: 400 }
+      )
+    }
+
+    // Validar edad mínima de 12 años
+    const age = currentYear - yearNum
+    if (age < 12) {
+      return NextResponse.json(
+        { error: 'Debes tener al menos 12 años para registrarte' },
         { status: 400 }
       )
     }
@@ -55,7 +75,7 @@ export async function POST(request: Request) {
         id: user.id,
         email: user.email,
         full_name: full_name.trim(),
-        birth_date,
+        birth_year: yearNum,
         city,
         postal_code: city === 'Viveiro' ? null : postal_code,
         updated_at: new Date().toISOString(),
