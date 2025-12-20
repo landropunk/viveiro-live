@@ -102,7 +102,11 @@ export default function CompleteProfilePage() {
 
       // Forzar recarga completa para propagación de cookies
       console.log('✅ Perfil completado, redirigiendo...');
-      window.location.href = '/dashboard';
+
+      // Pequeño delay para asegurar que el perfil se actualizó en el servidor
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 500);
     } catch (err) {
       console.error('❌ Error al completar perfil:', err);
       setError(err instanceof Error ? err.message : 'Error al completar el perfil');
