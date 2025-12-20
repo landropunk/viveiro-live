@@ -20,6 +20,7 @@ export default function SignUpPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +46,7 @@ export default function SignUpPage() {
       setError(error.message);
       setLoading(false);
     } else {
+      setRegisteredEmail(email);
       setSuccess(true);
       setLoading(false);
     }
@@ -76,15 +78,26 @@ export default function SignUpPage() {
               <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
                 ¡Cuenta creada!
               </h1>
-              <p className="mb-6 text-gray-600 dark:text-gray-400">
-                Revisa tu correo electrónico para confirmar tu cuenta.
+              <p className="mb-4 text-gray-600 dark:text-gray-400">
+                Hemos enviado un correo de confirmación a <span className="font-semibold">{registeredEmail}</span>
               </p>
-              <Link
-                href="/auth/signin"
-                className="inline-flex rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-3 font-semibold text-white transition-all hover:from-blue-700 hover:to-cyan-700 hover:shadow-lg"
-              >
-                Ir a iniciar sesión
-              </Link>
+              <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">
+                Haz clic en el enlace del correo o introduce el código de verificación
+              </p>
+              <div className="flex flex-col gap-3">
+                <Link
+                  href={`/auth/verify?email=${encodeURIComponent(registeredEmail)}`}
+                  className="inline-flex rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-3 font-semibold text-white transition-all hover:from-blue-700 hover:to-cyan-700 hover:shadow-lg justify-center"
+                >
+                  Introducir código de verificación
+                </Link>
+                <Link
+                  href="/auth/signin"
+                  className="inline-flex rounded-lg border-2 border-gray-300 px-6 py-3 font-semibold text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-500 dark:hover:bg-gray-800 justify-center"
+                >
+                  Ir a iniciar sesión
+                </Link>
+              </div>
             </div>
           </div>
         </div>
