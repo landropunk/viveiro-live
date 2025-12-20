@@ -81,6 +81,8 @@ export default function CompleteProfilePage() {
     }
 
     try {
+      console.log('📤 Enviando datos:', formData);
+
       const response = await fetch('/api/user/complete-profile', {
         method: 'POST',
         headers: {
@@ -89,17 +91,21 @@ export default function CompleteProfilePage() {
         body: JSON.stringify(formData),
       });
 
+      console.log('📥 Response status:', response.status);
+
       const data = await response.json();
+      console.log('📥 Response data:', data);
 
       if (!response.ok) {
         throw new Error(data.error || 'Error al completar el perfil');
       }
 
       // Forzar recarga completa para propagación de cookies
+      console.log('✅ Perfil completado, redirigiendo...');
       window.location.href = '/dashboard';
     } catch (err) {
+      console.error('❌ Error al completar perfil:', err);
       setError(err instanceof Error ? err.message : 'Error al completar el perfil');
-    } finally {
       setLoading(false);
     }
   };
