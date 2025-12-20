@@ -48,10 +48,10 @@ function VerifyEmailContent() {
 
       setSuccess(true);
 
-      // Redirigir al dashboard después de 2 segundos
+      // Redirigir a página de verificación exitosa después de 1.5 segundos
       setTimeout(() => {
-        router.push('/dashboard');
-      }, 2000);
+        window.location.href = '/auth/verified';
+      }, 1500);
 
     } catch (err: any) {
       setError(err.message || 'Código inválido o expirado');
@@ -88,10 +88,10 @@ function VerifyEmailContent() {
                 </div>
               </div>
               <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
-                ¡Email verificado!
+                ¡Código verificado!
               </h1>
               <p className="mb-6 text-gray-600 dark:text-gray-400">
-                Tu cuenta ha sido confirmada correctamente. Redirigiendo al dashboard...
+                Verificando tu cuenta...
               </p>
             </div>
           </div>

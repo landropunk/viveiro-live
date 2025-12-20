@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
+  const type = requestUrl.searchParams.get('type')
 
   // Usar NEXT_PUBLIC_SITE_URL si está configurado, sino usar origin de la request
   const origin = process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
 
     // Si el login fue exitoso, verificar/crear perfil de usuario
     if (data?.user) {
-      console.log(`✅ Usuario OAuth autenticado: ${data.user.email}`)
+      console.log(`✅ Usuario autenticado: ${data.user.email}`)
 
       // Verificar si el usuario ya tiene perfil
       const { data: existingProfile } = await supabase
@@ -54,10 +55,16 @@ export async function GET(request: Request) {
       } else {
         console.log(`✓ Usuario ${data.user.email} ya tiene perfil`)
       }
+
+      // Si es verificación de email, redirigir a página de éxito
+      if (type === 'signup' || type === 'email') {
+        console.log('📧 Verificación de email completada')
+        return NextResponse.redirect(`${origin}/auth/verified`)
+      }
     }
   }
 
-  // Redirigir al dashboard después del login
+  // Redirigir al dashboard después del login OAuth
   // El middleware se encargará de redirigir a /complete-profile si falta info
   return NextResponse.redirect(`${origin}/dashboard`)
 }
