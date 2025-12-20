@@ -28,10 +28,14 @@ export async function GET(request: Request) {
     if (data?.user) {
       console.log(`✅ Usuario autenticado: ${data.user.email}`)
 
+      // Detectar si es OAuth (Google, etc.) o verificación de email
+      const isOAuthProvider = data.user.app_metadata?.provider !== 'email'
+      const isEmailVerification = !isOAuthProvider && !data.user.email_confirmed_at
+
       // Verificar si el usuario ya tiene perfil
       const { data: existingProfile } = await supabase
         .from('user_profiles')
-        .select('id')
+        .select('id, full_name')
         .eq('id', data.user.id)
         .single()
 
@@ -52,19 +56,29 @@ export async function GET(request: Request) {
         } else {
           console.log(`✅ Perfil creado exitosamente para ${data.user.email}`)
         }
+
+        // Usuario nuevo sin perfil = verificación de email
+        console.log('📧 Verificación de email completada (usuario nuevo)')
+        return NextResponse.redirect(`${origin}/auth/verified`)
       } else {
         console.log(`✓ Usuario ${data.user.email} ya tiene perfil`)
+
+        // Si no tiene full_name, es un usuario que necesita completar perfil
+        if (!existingProfile.full_name) {
+          console.log('📧 Verificación de email completada (perfil incompleto)')
+          return NextResponse.redirect(`${origin}/auth/verified`)
+        }
       }
 
-      // Si es verificación de email, redirigir a página de éxito
+      // Si es verificación de email explícita (parámetro type)
       if (type === 'signup' || type === 'email') {
-        console.log('📧 Verificación de email completada')
+        console.log('📧 Verificación de email completada (tipo explícito)')
         return NextResponse.redirect(`${origin}/auth/verified`)
       }
     }
   }
 
-  // Redirigir al dashboard después del login OAuth
+  // Redirigir al dashboard después del login OAuth de Google
   // El middleware se encargará de redirigir a /complete-profile si falta info
   return NextResponse.redirect(`${origin}/dashboard`)
 }
