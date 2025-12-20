@@ -77,8 +77,8 @@ export default function CompleteProfilePage() {
         throw new Error(data.error || 'Error al completar el perfil');
       }
 
-      // Redirigir al dashboard
-      router.push('/dashboard');
+      // Forzar recarga completa para propagación de cookies
+      window.location.href = '/dashboard';
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al completar el perfil');
     } finally {
