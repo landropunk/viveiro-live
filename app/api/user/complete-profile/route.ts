@@ -48,17 +48,17 @@ export async function POST(request: Request) {
       )
     }
 
-    // Actualizar el perfil del usuario
+    // Actualizar o insertar el perfil del usuario (UPSERT)
     const { data, error } = await supabase
       .from('user_profiles')
-      .update({
+      .upsert({
+        id: user.id,
         full_name: full_name.trim(),
         birth_date,
         city,
         postal_code: city === 'Viveiro' ? null : postal_code,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', user.id)
       .select()
       .single()
 
